@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+
+# Copyright (C) 2014 Ray Schulz <rascul3@gmail.com>
+# This work is free. You can redistribute it and/or modify it under the
+# terms of the Do What The Fuck You Want To Public License, Version 2,
+# as published by Sam Hocevar. See the COPYING file for more details.
+
+import logging
+import os
+import json
+import urllib
+import urllib2
+import ConfigParser
+
+from oyoyo.client import IRCClient
+from oyoyo.cmdhandler import DefaultCommandHandler
+from oyoyo import helpers
+
+config = ConfigParser.ConfigParser()
+config.read(os.path.expanduser('~/.botwot.conf'))
+
+def connect_callback(bot):
+	nickpass = config.get('botwot', 'nickpass')
+	helpers.msg(bot, "NickServ", "IDENTIFY %s" % (nickpass,))
+	
+	channel = config.get('botwot', 'channel')
+	helpers.join(bot, channel)
+
+def wiki_search(self, chan, query):
+	try:
+		f = urllib2.urlopen('http://wotmud.wikia.com/api/v1/Search/List?query=%s&limit=1' % (urllib.quote_plus(query,)))
+		parsed_json = json.loads(f.read())
+		f.close()
+		helpers.msg(self.client, chan, parsed_json['items'][0]['url'])
+	except:
+		helpers.msg(self.client, chan, "couldn't find %s" % (query,))
+
+class BotHandler(DefaultCommandHandler):
+	def privmsg(self, nick, chan, msg):
+		if (msg == "botwot: enable party"):
+			helpers.msg(self.client, chan, "party time!")
+		elif (msg == "botwot: disable party"):
+			helpers.msg(self.client, chan, "party pooper")
+		elif (msg == "botwot: are you there?"):
+			helpers.msg(self.client, chan, "i'm here")
+		elif (msg == "botwot: open sores"):
+			source = config.get('botwot', 'source')
+			helpers.msg(self.client, chan, source)
+		elif (msg == "botwot: wiki"):
+			helpers.msg(self.client, chan, "http://wotmud.wikia.com")
+		elif (msg.startswith("botwot: wiki ")):
+			wiki_search(self, chan, msg.replace("botwot: wiki ", "", 1))
+
+def main():
+	loglevel = config.get('botwot', 'loglevel')
+	if (loglevel == "error"):
+		logging.basicConfig(level=logging.ERROR)
+	elif (loglevel == "info"):
+		logging.basicConfig(level=logging.INFO)
+	elif (loglevel == "debug"):
+		logging.basicConfig(level=logging.DEBUG)
+	
+	host = config.get('botwot', 'server')
+	port = config.getint('botwot', 'port')
+	nick = config.get('botwot', 'nick')	
+	
+	bot = IRCClient(BotHandler, host=host, port=port, nick=nick, connect_cb=connect_callback)
+	conn = bot.connect()
+	while True:
+		conn.next()
+
+if __name__ == '__main__':
+	main()

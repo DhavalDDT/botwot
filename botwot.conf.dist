@@ -1,0 +1,24 @@
+# this should be ~/.botwot.conf
+
+[botwot]
+
+# irc server to connect to
+server: chat.freenode.net
+
+# port to connect to on irc server
+port: 6667
+
+# channel to join
+channel: #botwot
+
+# nick for the bot
+nick: botwot
+
+# nickserv password
+nickpass: password
+
+# none, error, info, debug
+loglevel: error
+
+# source code
+source: https://github.com/rascul/botwot
