@@ -13,5 +13,6 @@ oyoyo is needed from https://code.google.com/p/oyoyo
 *  `botwot: open sores` - link to the sources
 *  `botwot: wiki` - link to the wotmud wiki
 *  `botwot: wiki <search term>` - search the wotmud wiki
+*  `botwot: smob <search term>` - search smob db for a smob
 
 botwot might learn new tricks in the future
