@@ -16,6 +16,8 @@ from oyoyo.client import IRCClient
 from oyoyo.cmdhandler import DefaultCommandHandler
 from oyoyo import helpers
 
+import psycopg2
+
 config = ConfigParser.ConfigParser()
 config.read(os.path.expanduser('~/.botwot.conf'))
 
@@ -35,6 +37,24 @@ def wiki_search(self, chan, query):
 	except:
 		helpers.msg(self.client, chan, "couldn't find %s" % (query,))
 
+def smob_search(self, chan, query):
+	db = psycopg2.connect(config.get('botwot', 'postgres'))
+	cur = db.cursor()
+	q = "select name, smobid from smob where name ilike %s or shortname ilike %s limit 1"
+	search = '%' + query + '%'
+	cur.execute(q, (search, search))
+	if cur.rowcount == 1:
+		result = cur.fetchone()
+		
+		message = "%s  http://smobdb.herokuapp.com/smobs/%s" % (result[0], result[1])
+		helpers.msg(self.client, chan, message)
+	else:
+		helpers.msg(self.client, chan, "couldn't find %s" % (query,))
+	
+	
+	
+	db.close()
+
 class BotHandler(DefaultCommandHandler):
 	def privmsg(self, nick, chan, msg):
 		if (msg == "botwot: enable party"):
@@ -50,6 +70,8 @@ class BotHandler(DefaultCommandHandler):
 			helpers.msg(self.client, chan, "http://wotmud.wikia.com")
 		elif (msg.startswith("botwot: wiki ")):
 			wiki_search(self, chan, msg.replace("botwot: wiki ", "", 1))
+		elif (msg.startswith("botwot: smob ")):
+			smob_search(self, chan, msg.replace("botwot: smob ", "", 1))
 
 def main():
 	loglevel = config.get('botwot', 'loglevel')

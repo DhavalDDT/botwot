@@ -22,3 +22,6 @@ loglevel: error
 
 # source code
 source: https://github.com/rascul/botwot
+
+# postgres connect string
+postgres: dbname=wotmod user=wotmod password=wotmod host=wotmod port=5432
