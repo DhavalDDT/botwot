@@ -24,7 +24,6 @@ config.read(os.path.expanduser('~/.botwot.conf'))
 def connect_callback(bot):
 	nickpass = config.get('botwot', 'nickpass')
 	helpers.msg(bot, "NickServ", "IDENTIFY %s" % (nickpass,))
-	
 	channel = config.get('botwot', 'channel')
 	helpers.join(bot, channel)
 
@@ -45,14 +44,10 @@ def smob_search(self, chan, query):
 	cur.execute(q, (search, search))
 	if cur.rowcount == 1:
 		result = cur.fetchone()
-		
 		message = "%s  http://smobdb.herokuapp.com/smobs/%s" % (result[0], result[1])
 		helpers.msg(self.client, chan, message)
 	else:
 		helpers.msg(self.client, chan, "couldn't find %s" % (query,))
-	
-	
-	
 	db.close()
 
 class BotHandler(DefaultCommandHandler):
