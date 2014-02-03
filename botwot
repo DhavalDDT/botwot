@@ -74,6 +74,8 @@ class BotHandler(DefaultCommandHandler):
 			smob_search(self, chan, msg.replace("botwot: smob ", "", 1))
 		elif (msg.startswith("botwot: insult ")):
 			insult(self, chan, msg.replace("botwot: insult ", "", 1))
+		elif (msg == "botwot: stats"):
+			helpers.msg(self.client, chan, "http://wotmad.herokuapp.com/stats  http://rascul.github.io/wotmad-stats")
 
 def main():
 	loglevel = config.get('botwot', 'loglevel')
