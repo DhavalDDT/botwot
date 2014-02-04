@@ -17,5 +17,6 @@ oyoyo is needed from https://code.google.com/p/oyoyo
 *  `botwot: insult <nick>` - insult someone
 *  `botwot: stats` - link to the stat db
 *  `botwot: num` - show number of players on the mud
+*  `botwot: time` - show the current mud time
 
 botwot might learn new tricks in the future
