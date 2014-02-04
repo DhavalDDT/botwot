@@ -49,6 +49,15 @@ def time(self, chan):
 	except:
 		helpers.msg(self.client, chan, "Something is broken?")
 
+def reboot(self, chan):
+	try:
+		f = urllib2.urlopen('http://wotmud.org/num.php')
+		match = re.search('.*Since the last reboot \( (\d{1,2}) hours, (\d{1,2}) minutes ago \):.*', f.read())
+		f.close()
+		helpers.msg(self.client, chan, "Last reboot was %s hours, %s minutes ago." % (match.group(1), match.group(2)))
+	except:
+		helpers.msg(self.client, chan, "Reboot yourself")
+
 def wiki_search(self, chan, query):
 	try:
 		f = urllib2.urlopen('http://wotmud.wikia.com/api/v1/Search/List?query=%s&limit=1' % (urllib.quote_plus(query,)))
@@ -120,6 +129,8 @@ class BotHandler(DefaultCommandHandler):
 				num(self, chan)
 			elif (command == "time"):
 				time(self, chan)
+			elif (command == "reboot"):
+				reboot(self, chan)
 
 def main():
 	loglevel = config.get('botwot', 'loglevel')
