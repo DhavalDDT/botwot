@@ -22,6 +22,8 @@ import psycopg2
 config = ConfigParser.ConfigParser()
 config.read(os.path.expanduser('~/.botwot.conf'))
 
+party_mode = False
+
 def connect_callback(bot):
 	nickpass = config.get('botwot', 'nickpass')
 	helpers.msg(bot, "NickServ", "IDENTIFY %s" % (nickpass,))
@@ -55,27 +57,46 @@ def insult(self, chan, nick):
 	lines = open('insults').read().splitlines()
 	helpers.msg(self.client, chan, "%s: %s" % (nick, random.choice(lines)))
 
+def enable_party(self, chan):
+	global party_mode
+	if (party_mode):
+		helpers.msg(self.client, chan, "you're late to the party")
+	else:
+		party_mode = True
+		helpers.msg(self.client, chan, "party time!")
+
+def disable_party(self, chan):
+	global party_mode
+	if (party_mode):
+		party_mode = False
+		helpers.msg(self.client, chan, "party pooper")
+	else:
+		helpers.msg(self.client, chan, "what party?")
+
 class BotHandler(DefaultCommandHandler):
 	def privmsg(self, nick, chan, msg):
-		if (msg == "botwot: enable party"):
-			helpers.msg(self.client, chan, "party time!")
-		elif (msg == "botwot: disable party"):
-			helpers.msg(self.client, chan, "party pooper")
-		elif (msg == "botwot: are you there?"):
-			helpers.msg(self.client, chan, "i'm here")
-		elif (msg == "botwot: open sores"):
-			source = config.get('botwot', 'source')
-			helpers.msg(self.client, chan, source)
-		elif (msg == "botwot: wiki"):
-			helpers.msg(self.client, chan, "http://wotmud.wikia.com")
-		elif (msg.startswith("botwot: wiki ")):
-			wiki_search(self, chan, msg.replace("botwot: wiki ", "", 1))
-		elif (msg.startswith("botwot: smob ")):
-			smob_search(self, chan, msg.replace("botwot: smob ", "", 1))
-		elif (msg.startswith("botwot: insult ")):
-			insult(self, chan, msg.replace("botwot: insult ", "", 1))
-		elif (msg == "botwot: stats"):
-			helpers.msg(self.client, chan, "http://wotmad.herokuapp.com/stats  http://rascul.github.io/wotmad-stats")
+		if (msg.startswith("botwot: ")):
+			command = msg.replace("botwot: ", "", 1).rstrip()
+			
+			if (command == "enable party"):
+				enable_party(self, chan)
+			elif (command == "disable party"):
+				disable_party(self, chan)
+			elif (command == "are you there?"):
+				helpers.msg(self.client, chan, "i'm here")
+			elif (command == "open sores"):
+				source = config.get('botwot', 'source')
+				helpers.msg(self.client, chan, source)
+			elif (command == "wiki"):
+				helpers.msg(self.client, chan, "http://wotmud.wikia.com")
+			elif (command.startswith("wiki ")):
+				wiki_search(self, chan, command.replace("wiki ", "", 1))
+			elif (command.startswith("smob ")):
+				smob_search(self, chan, command.replace("smob ", "", 1))
+			elif (command.startswith("insult ")):
+				insult(self, chan, command.replace("insult ", "", 1))
+			elif (command == "stats"):
+				helpers.msg(self.client, chan, "http://wotmad.herokuapp.com/stats  http://rascul.github.io/wotmad-stats")
 
 def main():
 	loglevel = config.get('botwot', 'loglevel')
