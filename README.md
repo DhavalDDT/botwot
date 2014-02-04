@@ -16,5 +16,6 @@ oyoyo is needed from https://code.google.com/p/oyoyo
 *  `botwot: smob <search term>` - search smob db for a smob
 *  `botwot: insult <nick>` - insult someone
 *  `botwot: stats` - link to the stat db
+*  `botwot: num` - show number of players on the mud
 
 botwot might learn new tricks in the future

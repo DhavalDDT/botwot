@@ -12,6 +12,7 @@ import urllib
 import urllib2
 import ConfigParser
 import random
+import re
 
 from oyoyo.client import IRCClient
 from oyoyo.cmdhandler import DefaultCommandHandler
@@ -29,6 +30,15 @@ def connect_callback(bot):
 	helpers.msg(bot, "NickServ", "IDENTIFY %s" % (nickpass,))
 	channel = config.get('botwot', 'channel')
 	helpers.join(bot, channel)
+
+def num(self, chan):
+	try:
+		f = urllib2.urlopen('http://wotmud.org/num.php')
+		match = re.search('.*There are currently (\d*) players on the game\..*', f.read())
+		f.close()
+		helpers.msg(self.client, chan, "There are currently %s players on the game." % (match.group(1),))
+	except:
+		helpers.msg(self.client, chan, "Is the mud down?")
 
 def wiki_search(self, chan, query):
 	try:
@@ -97,6 +107,8 @@ class BotHandler(DefaultCommandHandler):
 				insult(self, chan, command.replace("insult ", "", 1))
 			elif (command == "stats"):
 				helpers.msg(self.client, chan, "http://wotmad.herokuapp.com/stats  http://rascul.github.io/wotmad-stats")
+			elif (command == "num"):
+				num(self, chan)
 
 def main():
 	loglevel = config.get('botwot', 'loglevel')
