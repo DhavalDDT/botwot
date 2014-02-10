@@ -85,6 +85,10 @@ def insult(self, chan, nick):
 	lines = open('insults').read().splitlines()
 	helpers.msg(self.client, chan, "%s: %s" % (nick, random.choice(lines)))
 
+def compliment(self, chan, nick):
+	lines = open('compliments').read().splitlines()
+	helpers.msg(self.client, chan, "%s: %s" % (nick, random.choice(lines)))
+
 def enable_party(self, chan):
 	global party_mode
 	if (party_mode):
@@ -123,6 +127,8 @@ class BotHandler(DefaultCommandHandler):
 				smob_search(self, chan, command.replace("smob ", "", 1))
 			elif (command.startswith("insult ")):
 				insult(self, chan, command.replace("insult ", "", 1))
+			elif (command.startswith("compliment ")):
+				compliment(self, chan, command.replace("compliment ", "", 1))
 			elif (command == "stats"):
 				helpers.msg(self.client, chan, "http://wotmad.herokuapp.com/stats  http://rascul.github.io/wotmad-stats")
 			elif (command == "num"):
