@@ -7,6 +7,7 @@ be cure to edit botwot.conf.dist and put it at ~/.botwot.conf
 
 oyoyo is needed from https://code.google.com/p/oyoyo
 
+*  `botwot: compliment <nick>` - compliment someone
 *  `botwot: enable party` - enable party mode
 *  `botwot: disable party` - disable party mode
 *  `botwot: are you there?` - see if botwot is around
