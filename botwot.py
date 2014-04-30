@@ -107,7 +107,7 @@ def disable_party(self, chan):
 
 class BotHandler(DefaultCommandHandler):
 	def privmsg(self, nick, chan, msg):
-		if (msg.startswith("botwot: ")):
+		if (msg.startswith("botwot")):
 			command = msg.replace("botwot: ", "", 1).rstrip()
 			
 			if (command == "enable party"):
