@@ -25,3 +25,6 @@ source: https://github.com/rascul/botwot
 
 # postgres connect string
 postgres: dbname=wotmod user=wotmod password=wotmod host=wotmod port=5432
+
+# path to karma database must have read and write access
+karma_db: /home/me/.botwot.karma
