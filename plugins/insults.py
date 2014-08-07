@@ -7,11 +7,7 @@ def keyword_insult(context, msg, trigger, args, kargs):
 	""" be insulting """
 	
 	# determine target user
-	target_user = ""
-	if args:
-		target_user = args[0]
-	else:
-		target_user = msg.sender
+	target_user = " ".join(args) or msg.sender
 	
 	# pick a random insult and give it to the target user
 	rand = SystemRandom()
