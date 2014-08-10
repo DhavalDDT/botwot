@@ -1,15 +1,17 @@
-from random import SystemRandom
+import requests
+from bs4 import BeautifulSoup
 
 from pyaib.plugins import keyword
 
-@keyword('insult')
+@keyword("insult")
 def keyword_insult(context, msg, trigger, args, kargs):
 	""" be insulting """
 	
 	# determine target user
 	target_user = " ".join(args) or msg.sender
 	
-	# pick a random insult and give it to the target user
-	rand = SystemRandom()
-	insult = context.config.plugin.insults[rand.randint(0, len(context.config.plugin.insults)-1)]
-	msg.reply("%s: %s" % (target_user, insult))
+	# grab a randomly generated insult from insultgenerator.org
+	page = requests.get("http://www.insultgenerator.org")
+	soup = BeautifulSoup(page.text)
+	msg.reply("%s: %s" % (target_user, soup.td.string))
+	
