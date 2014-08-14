@@ -1,9 +1,9 @@
 import re
-import json
 from urllib import quote
 
 from bs4 import BeautifulSoup
 import requests
+
 from pyaib.plugins import observe
 
 @observe('IRC_MSG_PRIVMSG')
