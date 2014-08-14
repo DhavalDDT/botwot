@@ -21,5 +21,5 @@ def keyword_wolframalpha(context, msg, trigger, args, kargs):
 	if len(res.pods) > 1:
 		msg.reply("%s: %s" % (target_user, res.pods[1].text))
 	else:
-		msg.reply("%s: no results")
+		msg.reply("%s: no results" % target_user)
 
