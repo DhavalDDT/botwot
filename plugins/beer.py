@@ -14,7 +14,7 @@ def keyword_beer(context, msg, trigger, args, kargs):
 	target_user = " ".join(args) or msg.sender
 	
 	# grab the top 250 beers from beeradvocate.com
-	page = requests.get("http://www.beeradvocate.com/lists/top/")
+	page = requests.get("http://tmp.rascul.io/beers.html")
 	soup = BeautifulSoup(page.text)
 	beer = soup.table.contents[random.randint(4, len(soup.table.contents))].contents[1].span
 	
