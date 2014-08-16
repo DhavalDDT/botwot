@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+
+import sys
+import shelve
+
+import requests
+from bs4 import BeautifulSoup
+
+sys.setrecursionlimit(50000)
+
+d = shelve.open("/tmp/beers.shelve")
+page = requests.get("http://www.beeradvocate.com/lists/top/")
+soup = BeautifulSoup(page.text)
+
+beers = soup.table.contents[4:]
+count = 0
+for beer in beers:
+	beer = beer.contents[1].span
+	beer_name = beer.contents[0].text
+	beer_url = "http://www.beeradvocate.com%s" % beer.contents[0].get("href")
+	beer_brewer = beer.contents[2].text
+	if len(beer.contents) >= 6: 
+		beer_abv = beer.contents[5]
+	else:
+		beer_abv = ""
+	newbeer = {
+		"name": beer_name.encode("utf-8"),
+		"brewer": beer_brewer.encode("utf-8"),
+		"abv": beer_abv.encode("utf-8"),
+		"url": beer_url.encode("utf-8")
+	}
+	d[str(count)] = newbeer
+	
+	count += 1
+
+d.close()
