@@ -47,6 +47,7 @@ class Beer(object):
 	
 	# Uncomment the scanbeer command only to scan beers.json to the db
 	# This will probably become more robust in the future
+	# beers.json comes from https://github.com/sbuss/beeradvocate-scraper
 	#@keyword("scanbeer")
 	#def keyword_scanbeer(self, context, msg, trigger, args, kargs):
 		#""" load the beer listing into the database """
