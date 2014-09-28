@@ -26,23 +26,18 @@ class Weed(object):
 		
 		# refresh the weed listings
 		for species in ["sativa", "indica", "hybrid"]:
-			print species
 			page = requests.get("http://www.leafly.com/%s" % species)
 			soup = BeautifulSoup(page.text)
 			
 			for strain in soup.find_all("div", "strain-element"):
 				if strain.a:
 					item = self.db.get(strain.a.text)
-					
-					print "BEFORE: %s : %s" % (strain.a.text, strain.a["href"])
 					item.value = re.sub(
 						r'/.*/%s/(?P<strain>.*$)' % species,
 						"/%s/\g<strain>$" % species,
 						strain.a["href"]
 						)
 					item.value = strain.a["href"]
-					print "AFTER : %s : %s" % (strain.a.text, strain.a["href"])
-					
 					item.commit()
 				
 		self.weed = list(self.db.getAll())
