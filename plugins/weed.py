@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import requests
 
 devices = [
-	"vape"
+	"vape",
 	"bong",
 	"bowl",
 	"chillum",
