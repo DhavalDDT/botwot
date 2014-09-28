@@ -8,14 +8,14 @@ from bs4 import BeautifulSoup
 import requests
 
 devices = [
-	"blunt",
+	"vape"
 	"bong",
 	"bowl",
 	"chillum",
 	"joint",
 	"pipe",
 	"spliff",
-	"vape"
+	"blunt",
 	]
 
 @plugin_class
