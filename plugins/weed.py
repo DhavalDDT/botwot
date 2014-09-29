@@ -1,5 +1,4 @@
 import random
-import re
 
 from pyaib.plugins import keyword, plugin_class
 from pyaib.db import db_driver
@@ -32,12 +31,7 @@ class Weed(object):
 			for strain in soup.find_all("div", "strain-element"):
 				if strain.a:
 					item = self.db.get(strain.a.text)
-					item.value = re.sub(
-						r'/.*/(hybrid|indica|sativa)/(?P<strain>.*$)',
-						"/%s/\g<strain>$" % species,
-						strain.a["href"]
-						)
-					item.value = strain.a["href"]
+					item.value = "/%s" % "/".join(strain.a["href"].split("/")[-2:])
 					item.commit()
 				
 		self.weed = list(self.db.getAll())
