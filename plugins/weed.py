@@ -56,7 +56,7 @@ class Weed(object):
 		if target_user == "round":
 			context.PRIVMSG(
 				msg.channel or msg.sender,
-				"\x01ACTION passes around a %s with %s. (https://www.leafly.com%s)" % (
+				"\x01ACTION passes around a %s with %s. (https://www.leafly.com%s)\x01" % (
 					random.choice(devices),
 					strain.key,
 					strain.value
