@@ -33,7 +33,7 @@ class Weed(object):
 				if strain.a:
 					item = self.db.get(strain.a.text)
 					item.value = re.sub(
-						r'/.*/(hybrid|indica|sativa)/(?P<strain>.*$)' % species,
+						r'/.*/(hybrid|indica|sativa)/(?P<strain>.*$)',
 						"/%s/\g<strain>$" % species,
 						strain.a["href"]
 						)
