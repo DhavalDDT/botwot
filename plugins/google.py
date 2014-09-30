@@ -26,7 +26,7 @@ def keyword_google(context, msg, trigger, args, kargs):
 		search = requests.get("http://ajax.googleapis.com/ajax/services/search/web", params={"v": "1.0", "q": query})
 		res = json.loads(search.text)
 		if len(res["responseData"]["results"]) > 0:
-			url = res["responseData"]["results"][0]["url"]
+			url = res["responseData"]["results"][0]["unescapedUrl"]
 			title = res["responseData"]["results"][0]["titleNoFormatting"]
 			msg.reply("%s: %s - %s" % (target_user, title, url))
 		else:
