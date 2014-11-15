@@ -48,10 +48,7 @@ class Weed(object):
 		# determine if a specific person, and who, or a round for everyone
 		target_user = " ".join(args)
 		
-		if target_user == "turgenevskaya" or msg.sender == "turgenevskaya":
-			msg.reply("turgenevskaya: I wouldn't share it wit hyou")
-		
-		elif target_user == "round":
+		if target_user == "round":
 			context.PRIVMSG(
 				msg.channel or msg.sender,
 				"\x01ACTION passes around a %s with %s. (https://www.leafly.com%s)\x01" % (
