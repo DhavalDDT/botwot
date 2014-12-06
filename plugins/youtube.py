@@ -10,7 +10,7 @@ from pyaib.plugins import observe
 def observe_privmsg(context, msg):
 	""" look up youtube links """
 	
-	m = re.match(r'^\s*(?P<url>(https?://)?(www\.)?youtube\.com/watch\S*)(\s+\|\s+(?P<target_user>\S+))?', msg.message)
+	m = re.match(r'^\s*(?P<url>(https?://)?(www\.)?(youtube\.com/watch|youtu.be)\S*)(\s+\|\s+(?P<target_user>\S+))?', msg.message)
 	if m:
 		url = m.groupdict().get("url")
 		target_user = m.groupdict().get("target_user") or msg.sender
