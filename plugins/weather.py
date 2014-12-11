@@ -1,4 +1,6 @@
-import pyowm
+import json
+
+import requests
 
 from pyaib.plugins import keyword, plugin_class
 from pyaib.db import db_driver
@@ -6,24 +8,8 @@ from pyaib.db import db_driver
 @plugin_class
 class Weather(object):
 	def __init__(self, context, config):
-		self.owm = pyowm.OWM()
-	
-	
-	def calculate_direction(self, degree):
-		""" determine a compass direction based on numeric degrees """
-		
-		direction = " "
-		if       0 <= degree <  22.5: direction = " N"
-		elif  22.5 <= degree <  67.5: direction = " NE"
-		elif  67.5 <= degree < 112.5: direction = " E"
-		elif 112.5 <= degree < 157.5: direction = " SE"
-		elif 157.5 <= degree < 202.5: direction = " S"
-		elif 202.5 <= degree < 247.5: direction = " SW"
-		elif 247.5 <= degree < 292.5: direction = " W"
-		elif 292.5 <= degree < 337.5: direction = " NW"
-		elif 337.5 <= degree <=  360: direction = " N"
-		
-		return direction
+		self.context = context
+		self.config = context.config
 	
 	
 	@keyword("weather")
@@ -35,34 +21,41 @@ class Weather(object):
 		query = ""
 		if len(args) >= 3 and args[-2] == "|":
 			target_user = args[-1]
-			query = " ".join(args[:-2])
+			query = args[:-2]
 		else:
 			target_user = msg.sender
-			query = " ".join(args)
+			query = args
 		
-		# figure out the units
-		units = ["fahrenheit", u"\N{DEGREE SIGN}F"]
-		if "c" in kargs:
-			units = ["celsius", u"\N{DEGREE SIGN}C"]
-		elif "k" in kargs:
-			units = ["kelvin", "K"]
+		location = None
+		if len(query) == 1:
+			location = query[0]
+		elif len(query) == 2:
+			location = "%s/%s" % (query[1], query[0].rstrip(','))
 		
-		observation = self.owm.weather_at_place(str(query))
-		
-		if observation:
-			weather = observation.get_weather()
-			
-			msg.reply("%s: Conditions for %s: %s%s, %s, %s%% humidity, wind %sMPH%s" % (
-					target_user or msg.sender,
-					query, 
-					weather.get_temperature(units[0])['temp'],
-					units[1],
-					weather.get_detailed_status(),
-					weather.get_humidity(),
-					weather.get_wind()['speed'],
-					self.calculate_direction(weather.get_wind()['deg'])
-					)
+		if location:
+			url = "https://api.wunderground.com/api/%s/conditions/q/%s.json" % (
+				self.config.plugin.weather.apikey,
+				location
 				)
-
 			
-
+			page = requests.get(url)
+			j = json.loads(page.text)
+			
+			if 'current_observation' in j:
+				# figure out the temp in what unit
+				temp = u"%s\N{DEGREE SIGN}F" % j['current_observation']['temp_f']
+				if "c" in kargs:
+					temp = u"%s\N{DEGREE SIGN}C" % j['current_observation']['temp_c']
+				elif "k" in kargs:
+					temp = "%sK" % str(float(j['current_observation']['temp_c']) + 273.15)
+				
+				msg.reply("%s: Conditions for %s: %s, %s, %s humidity, wind %sMPH %s" % (
+						target_user or msg.sender,
+						j['current_observation']['observation_location']['full'],
+						temp,
+						j['current_observation']['weather'],
+						j['current_observation']['relative_humidity'],
+						j['current_observation']['wind_mph'],
+						j['current_observation']['wind_dir']
+						)
+					)
