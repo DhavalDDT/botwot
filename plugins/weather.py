@@ -29,8 +29,9 @@ class Weather(object):
 		location = None
 		if len(query) == 1:
 			location = query[0]
-		elif len(query) == 2:
-			location = "%s/%s" % (query[1], query[0].rstrip(','))
+		elif len(query) >= 2:
+			query.insert(0, query.pop())
+			location = "%s/%s" % (query[0], " ".join(query[1:]))
 		
 		if location:
 			url = "https://api.wunderground.com/api/%s/conditions/q/%s.json" % (
