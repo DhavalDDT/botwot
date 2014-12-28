@@ -30,7 +30,6 @@ class Cookie(object):
 		
 		# Fill the database
 		for c in self.cookies:
-			print "adding %s to the cookie jar" % c
 			item = self.db.get(c)
 			item.value = "%s" % c
 			item.commit()
