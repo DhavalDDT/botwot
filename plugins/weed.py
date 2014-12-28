@@ -17,11 +17,11 @@
 
 import random
 
+import requests
+from bs4 import BeautifulSoup
+
 from pyaib.plugins import keyword, plugin_class
 from pyaib.db import db_driver
-
-from bs4 import BeautifulSoup
-import requests
 
 devices = [
 	"vape",
