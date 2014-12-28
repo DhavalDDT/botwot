@@ -37,11 +37,12 @@ class Cookie(object):
 	
 	
 	@keyword("cookie")
+	@keyword.nosub("round")
 	def keyword_cookie(self, context, msg, trigger, args, kargs):
-		""" hand out some cookies """
+		""" <user> - Hand out a cookie, to <user> if specified """
 		
 		# choose a random cookie
-		cookie = random.choice(self.cookies)
+		cookie = random.choice(self.cookies).value
 		
 		target_user = " ".join(args)
 		context.PRIVMSG(
@@ -50,6 +51,20 @@ class Cookie(object):
 				target_user or msg.sender, 
 				cookie
 				)
+			)
+	
+	
+	@keyword("cookie")
+	@keyword.sub("round")
+	def keyword_cookie_round(self, context, msg, trigger, args, kargs):
+		""" - Pass around a box of cookies """
+		
+		# Choose a random cookie
+		cookie = random.choice(self.cookies).value
+		
+		context.PRIVMSG(
+			msg.channel or msg.sender,
+			"\x01ACTION passes around a box of %s.\x01" % cookie
 			)
 	
 	
