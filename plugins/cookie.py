@@ -33,7 +33,10 @@ class Cookie(object):
 			print "adding %s to the cookie jar" % c
 			item = self.db.get(c)
 			item.value = "%s" % c
-			item.commit()		
+			item.commit()
+			counter += 1
+		
+		return counter
 	
 	
 	@keyword("cookie")
@@ -73,5 +76,5 @@ class Cookie(object):
 		""" load the cookie list into the database """
 		
 		if msg.sender == context.config.IRC.admin:
-			self.scancookies()
+			msg.reply("%s cookies scanned." %  self.scancookies())
 
