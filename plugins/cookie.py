@@ -33,7 +33,7 @@ class Cookie(object):
 	
 	
 	@keyword("cookie")
-	@keyword.nosub("round")
+	@keyword.nosub("round", "refresh")
 	def keyword_cookie(self, context, msg, trigger, args, kargs):
 		""" [<user>] - Hand out a cookie, to <user> if specified """
 		
@@ -71,8 +71,6 @@ class Cookie(object):
 	def scancookies(self):
 		""" Download and scan the cookie list into the database """
 		
-		print "Scanning cookies..."
-		
 		counter = 0
 		
 		# Grab the listing from Wikipedia
@@ -83,25 +81,33 @@ class Cookie(object):
 		cookie_cells = [tr.td for tr in soup.table.find_all("tr")][1:]
 		
 		# grab the cookie name from each row, some have links and some don't
-		self.cookies = [getattr(c.contents[0], "text", None) or getattr(c, "text", None) for c in cookie_cells]
+		new_cookies = [getattr(c.contents[0], "text", None) or getattr(c, "text", None) for c in cookie_cells]
 		
 		# Fill the database
-		for c in self.cookies:
+		for c in new_cookies:
 			item = self.db.get(c)
 			item.value = "%s" % c
 			item.commit()
 			counter += 1
 		
+		self.cookies = list(self.db.getAll())
 		print "%s cookies scanned." % counter
 		
 		return counter
 	
 	
-	@keyword("scancookies")
-	def keyword_scancookies(self, context, msg, trigger, args, kargs):
+	@keyword("cookie")
+	@keyword.sub("refresh")
+	def keyword_cookie_refresh(self, context, msg, trigger, args, kargs):
 		""" Download and scan the cookie list into the database """
 		
 		# Only if user is an admin
 		if msg.sender == context.config.IRC.admin:
+			print "Scanning cookies..."
+			
+			# First clear the database
+			for item in self.cookies:
+				self.db.delete(item.key)
+			
 			msg.reply("%s cookies scanned." %  self.scancookies())
 
