@@ -49,7 +49,7 @@ class Weed(object):
 	
 	
 	@keyword("weed")
-	@keyword.nosub("round")
+	@keyword.nosub("round", "refresh")
 	def keyword_weed(self, context, msg, trigger, args, kargs):
 		""" [<user>] - Hand out some weed, to <user> if specified """
 		
@@ -92,8 +92,6 @@ class Weed(object):
 	
 	def scanweed(self):
 		""" Download and scan the strains into the database """
-		
-		print "Scanning cannabis dispensaries..."""
 		
 		# API information
 		url = "http://data.leafly.com/strains"
@@ -143,14 +141,18 @@ class Weed(object):
 		return counter
 	
 	
-	@keyword("scanweed")
-	def keyword_scanweed(self, context, msg, trigger, args, kargs):
-		""" - Download and scan the strains into the database """
+	@keyword("weed")
+	@keyword.sub("refresh")
+	def keyword_weed_refresh(self, context, msg, trigger, args, kargs):
+		""" - Refresh the strain listings """
 		
 		# Only if user is an admin
 		if msg.sender == context.config.IRC.admin:
+			print "Scanning cannabis dispensaries..."""
+			
 			# First clear the database
 			for item in self.weed:
 				self.db.delete(item.key)
 			
 			msg.reply("%s strains scanned." %  self.scanweed())
+	
