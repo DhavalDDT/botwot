@@ -35,7 +35,7 @@ class Cookie(object):
 	@keyword("cookie")
 	@keyword.nosub("round")
 	def keyword_cookie(self, context, msg, trigger, args, kargs):
-		""" <user> - Hand out a cookie, to <user> if specified """
+		""" [<user>] - Hand out a cookie, to <user> if specified """
 		
 		# Choose a cookie
 		cookie = random.choice(self.cookies).value
