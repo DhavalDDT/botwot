@@ -15,72 +15,142 @@
 # under the License.
 
 
+import json
 import random
 
 import requests
-from bs4 import BeautifulSoup
 
 from pyaib.plugins import keyword, plugin_class
 from pyaib.db import db_driver
 
+# Vape is a little heavy to make it come up more for the hipsters
 devices = [
 	"vape",
 	"bong",
 	"bowl",
 	"chillum",
 	"joint",
+	"vape",
 	"pipe",
 	"spliff",
 	"blunt",
+	"bubbler",
+	"vape",
 	]
 
 @plugin_class
 @plugin_class.requires('db')
 class Weed(object):
 	def __init__(self, context, config):
+		self.context = context
 		self.db = context.db.get("weed")
-		
-		# refresh the weed listings
-		for species in ["sativa", "indica", "hybrid"]:
-			page = requests.get("http://www.leafly.com/%s" % species)
-			soup = BeautifulSoup(page.text)
-			
-			for strain in soup.find_all("div", "strain-element"):
-				if strain.a:
-					item = self.db.get(strain.a.text)
-					item.value = "/%s" % "/".join(strain.a["href"].split("/")[-2:])
-					item.commit()
-				
 		self.weed = list(self.db.getAll())
-		self.num_strains = len(self.weed)
-		print "%s strains are in the dispensary." % self.num_strains
+		print "%s strains are in the dispensary." % len(self.weed)
 	
 	
 	@keyword("weed")
+	@keyword.nosub("round")
 	def keyword_weed(self, context, msg, trigger, args, kargs):
-		""" hand out some weed """
+		""" [<user>] - Hand out some weed, to <user> if specified """
 		
+		# Choose a strain
 		strain = random.choice(self.weed)
 		
-		# determine if a specific person, and who, or a round for everyone
+		# Determine who should get the weed
 		target_user = " ".join(args)
 		
-		if target_user == "round":
-			context.PRIVMSG(
-				msg.channel or msg.sender,
-				"\x01ACTION passes around a %s with %s. (https://www.leafly.com%s)\x01" % (
-					random.choice(devices),
-					strain.key,
-					strain.value
-					)
+		# Pass the weed
+		context.PRIVMSG(
+			msg.channel or msg.sender, 
+			"\x01ACTION hands %s a %s with %s. (%s)\x01" % (
+				target_user or msg.sender, 
+				random.choice(devices),
+				strain.key,
+				strain.value
 				)
-		else:
-			context.PRIVMSG(
-				msg.channel or msg.sender, 
-				"\x01ACTION hands %s a %s with %s. (https://www.leafly.com%s)\x01" % (
-					target_user or msg.sender, 
-					random.choice(devices),
-					strain.key,
-					strain.value
-					)
+			)
+	
+	
+	@keyword("weed")
+	@keyword.sub("round")
+	def keyword_weed_round(self, context, msg, trigger, args, kargs):
+		""" - Pass around some cannabis to consume """
+		
+		# Choose a strain
+		strain = random.choice(self.weed)
+		
+		# Pass it around
+		context.PRIVMSG(
+			msg.channel or msg.sender,
+			"\x01ACTION passes around a %s with %s. (%s)\x01" % (
+				random.choice(devices),
+				strain.key,
+				strain.value
 				)
+			)
+	
+	
+	def scanweed(self):
+		""" Download and scan the strains into the database """
+		
+		print "Scanning cannabis dispensaries..."""
+		
+		# API information
+		url = "http://data.leafly.com/strains"
+		headers = {
+			'app_id': self.context.config.plugin.weed.appid,
+			'app_key': self.context.config.plugin.weed.apikey
+			}
+		
+		# Helper stuff
+		counter = 0
+		pagenum = 0
+		take = 100
+		
+		data = {
+			'Page': pagenum,
+			'Take': 100
+			}
+		
+		# Loop through the paginated api
+		while True:
+			data['Page'] = pagenum
+			
+			page = requests.post(url, data=json.dumps(data), headers=headers)
+			
+			try:
+				j = page.json()
+			except ValueError:
+				break
+			
+			if 'Strains' in j and len(['Strains']) > 0:
+				strains = j['Strains']
+				
+				for s in strains:
+					if s['Category'] != 'Edible':
+						item = self.db.get(s['Name'])
+						item.value = s['permalink']
+						item.commit()
+						counter += 1
+			else:
+				break
+			
+			pagenum += 1
+		
+		self.weed = list(self.db.getAll())
+		print "%s strains scanned." % counter
+		
+		return counter
+	
+	
+	@keyword("scanweed")
+	def keyword_scanweed(self, context, msg, trigger, args, kargs):
+		""" - Download and scan the strains into the database """
+		
+		# Only if user is an admin
+		if msg.sender == context.config.IRC.admin:
+			# First clear the database
+			for item in self.weed:
+				self.db.delete(item.key)
+			
+			msg.reply("%s strains scanned." %  self.scanweed())
