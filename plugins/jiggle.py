@@ -25,12 +25,17 @@ class Jiggle(object):
 	
 	@keyword("jiggle")
 	def keyword_jiggle(self, context, msg, trigger, args, kargs):
-		""" jiggle that robot ass """
+		""" that robot ass """
 		
-		target_user = " ".join(args) or "phalacee"
+		target_user = " ".join(args)
 		
-		context.PRIVMSG(
-			msg.channel or msg.sender, 
-			"\x01ACTION jiggles his robot ass at %s\x01" % target_user 
-			)
-
+		if target_user:
+			context.PRIVMSG(
+				msg.channel or msg.sender, 
+				"\x01ACTION jiggles his robot ass at %s\x01" % target_user 
+				)
+		else:
+			context.PRIVMSG(
+				msg.channel or msg.sender,
+				"\x01ACTION jiggles his robot ass\x01"
+				)
