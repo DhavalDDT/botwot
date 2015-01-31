@@ -15,6 +15,8 @@
 # under the License.
 
 
+import random
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -27,8 +29,26 @@ def keyword_insult(context, msg, trigger, args, kargs):
 	# determine target user
 	target_user = " ".join(args) or msg.sender
 	
-	# grab a randomly generated insult from randominsults.net
-	page = requests.get("http://randominsults.net")
-	soup = BeautifulSoup(page.text)
-	msg.reply("%s: %s" % (target_user, soup.td.strong.i.string))
+	choice = random.choice([
+		"randominsults",
+		"shaker",
+		"lutheran"
+	])
+	
+	if choice == "randominsults":
+		# grab a randomly generated insult from randominsults.net
+		page = requests.get("http://randominsults.net")
+		soup = BeautifulSoup(page.text)
+		insult = soup.td.strong.i.string
+	elif choice == "shaker":
+		page = requests.get("http://www.pangloss.com/seidel/Shaker/")
+		soup = BeautifulSoup(page.text)
+		insult = soup.font.string
+	elif choice == "lutheran":
+		page = requests.get("http://ergofabulous.org/luther/")
+		soup = BeautifulSoup(page.text)
+		insult = soup.find("p", "larger").string
+	
+	if insult:
+		msg.reply("%s: %s" % (target_user, insult))
 	
