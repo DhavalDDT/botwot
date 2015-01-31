@@ -31,17 +31,29 @@ class UrlTitle(object):
 	
 	@observe("IRC_MSG_PRIVMSG")
 	def observe_privmsg(self, context, msg):
-		""" Look up HTML titles for whitelisted domains """
+		""" Look up HTML titles for URLs """
 		
-		for d in self.domains:
-			if d in msg.message:
-				m = re.match(r'((?P<directed_user>\S*?)(:|,)?\s*?)?(?P<url>(https?://)?(www\.)?(%s)\S*)(\s+\|\s+(?P<target_user>\S+))?' % re.escape(d), msg.message)
-				if m:
-					print "url: ", m.groupdict().get("url")
-					url = m.groupdict().get("url")
-					target_user = m.groupdict().get("directed_user") or m.groupdict().get("target_user") or msg.sender
-					
-					if url and target_user:
-						page = requests.get(url)
-						soup = BeautifulSoup(page.text)
-						msg.reply("%s: %s" % (target_user, soup.title.string))
+		
+		m = re.match(r'(.* )?(?P<url>(https?://)?(www\.)?([a-z0-9\.\-]+\.[a-z0-9]+)\S*)( .*)?', msg.message)
+		if m:
+			# Grab the URL
+			url = m.groupdict().get("url")
+			
+			# Make sure url has http:// or https://
+			if not url.startswith("http://") and not url.startswith("https://"):
+				url = "http://%s" % url
+			
+			# Get the page and parse it for title and meta description
+			page = requests.get(url)
+			soup = BeautifulSoup(page.text)
+			title = soup.title.string
+			try:
+				desc = " | %s" % soup.findAll(attrs={"name":"description"})[0]['content']
+			except:
+				desc = ""
+			answer = "%s%s" % (title, desc)
+			answer = answer[:256]
+			
+			if answer:
+				msg.reply("%s: %s" % (msg.sender, answer))
+			
