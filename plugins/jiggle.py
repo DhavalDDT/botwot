@@ -32,10 +32,10 @@ class Jiggle(object):
 		if target_user:
 			context.PRIVMSG(
 				msg.channel or msg.sender, 
-				"\x01ACTION jiggles her robot ass at %s\x01" % target_user 
+				"\x01ACTION jiggles his robot ass at %s\x01" % target_user 
 				)
 		else:
 			context.PRIVMSG(
 				msg.channel or msg.sender,
-				"\x01ACTION jiggles her robot ass\x01"
+				"\x01ACTION jiggles his robot ass\x01"
 				)
