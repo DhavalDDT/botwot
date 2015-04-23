@@ -44,7 +44,7 @@ class Wiki(object):
 		
 		
 		url = "http://wotmud.wikia.com/api/v1/Search/List"
-		payload = {'query': ' '.join(args), 'limit': 1}
+		payload = {'query': query, 'limit': 1}
 		r = requests.get(url, params=payload)
 		j = json.loads(r.text)
 		if j and 'items' in j:
