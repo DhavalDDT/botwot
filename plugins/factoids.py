@@ -1,4 +1,4 @@
-""" Factoids Plugin (porcsie plugins.factoids) """
+""" Factoids Plugin (botwot plugins.factoids) """
 
 # Copyright 2015 Ray Schulz <https://rascul.io>
 #

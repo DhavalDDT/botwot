@@ -1,4 +1,4 @@
-""" Google Plugin (yamms plugins.google) """
+""" Google Plugin (botwot plugins.google) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #

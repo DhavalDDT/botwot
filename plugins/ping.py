@@ -1,4 +1,4 @@
-""" Ping Plugin (yamms plugins.ping) """
+""" Ping Plugin (botwot plugins.ping) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #

@@ -1,4 +1,4 @@
-""" Jiggle Plugin (yamms plugins.jiggle) """
+""" Jiggle Plugin (botwot plugins.jiggle) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #

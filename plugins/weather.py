@@ -1,4 +1,4 @@
-""" Weather Plugin (yamms plugins.weather) """
+""" Weather Plugin (botwot plugins.weather) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #

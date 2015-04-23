@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" Yamms the fun IRC bot <https://git.rascul.io/irc/yamms> """
+""" Yamms the fun IRC bot <https://git.rascul.io/irc/botwot> """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #
@@ -24,8 +24,8 @@ import sys
 
 argv = sys.argv[1:]
 
-#Load 'yamms.conf' from the par
-bot = IrcBot(argv[0] if argv else 'yamms.conf')
+#Load 'botwot.conf' from the par
+bot = IrcBot(argv[0] if argv else 'botwot.conf')
 
 # print("Config Dump: %s" % bot.config)
 

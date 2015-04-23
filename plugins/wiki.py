@@ -1,4 +1,4 @@
-""" Wikipedia Plugin (yamms plugins.wiki) """
+""" Wikipedia Plugin (botwot plugins.wiki) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #

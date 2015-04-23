@@ -1,4 +1,4 @@
-""" Url Title Plugin (yamms plugins.urltitle) """
+""" Url Title Plugin (botwot plugins.urltitle) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #

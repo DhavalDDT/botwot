@@ -1,4 +1,4 @@
-""" Beer Plugin (yamms plugins.beer) """
+""" Beer Plugin (botwot plugins.beer) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #

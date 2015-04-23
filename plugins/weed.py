@@ -1,4 +1,4 @@
-""" Weed Plugin (yamms plugins.weed) """
+""" Weed Plugin (botwot plugins.weed) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #

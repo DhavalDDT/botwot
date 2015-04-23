@@ -1,4 +1,4 @@
-""" Cookie Plugin (yamms plugins.cookie) """
+""" Cookie Plugin (botwot plugins.cookie) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #

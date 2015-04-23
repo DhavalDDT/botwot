@@ -1,4 +1,4 @@
-""" Wolfram Alpha Plugin (yamms plugins.wa) """
+""" Wolfram Alpha Plugin (botwot plugins.wa) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #

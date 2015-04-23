@@ -1,4 +1,4 @@
-""" Insults Plugin (yamms plugins.insults) """
+""" Insults Plugin (botwot plugins.insults) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #
