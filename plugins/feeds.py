@@ -47,19 +47,19 @@ class Feeds(object):
 	
 	@every(15, name='feeds')
 	def feeds(self, context, name):
-		for feed_url in self.config.plugin.feeds:
-			feed = feedparser.parse(feed_url)
-			for entry in reversed(feed.entries):
-				link = submit_link(entry['link'])
-				if link:
-					title = entry['title']
-					if len(title) > 200:
-						title = "%s..." % title[:200]
-					message = "%s posted %s - %s" % (
-						entry['author_detail']['name'],
-						title,
-						link)
-					context.PRIVMSG("#yamms", message)
+		#for feed_url in self.config.plugin.feeds:
+		feed = feedparser.parse("http://talk.wutmod.xyz/latest.rss")
+		for entry in reversed(feed.entries):
+			link = submit_link(entry['link'])
+			if link:
+				title = entry['title']
+				if len(title) > 200:
+					title = "%s..." % title[:200]
+				message = "%s posted %s - %s" % (
+					entry['author_detail']['name'],
+					title,
+					link)
+				context.PRIVMSG("#yamms", message)
 		
 
 
