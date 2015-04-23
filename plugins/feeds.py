@@ -50,7 +50,7 @@ class Feeds(object):
 		#for feed_url in self.config.plugin.feeds:
 		feed = feedparser.parse("http://talk.wutmod.xyz/latest.rss")
 		for entry in reversed(feed.entries):
-			link = submit_link(entry['link'])
+			link = self.submit_link(entry['link'])
 			if link:
 				title = entry['title']
 				if len(title) > 200:
