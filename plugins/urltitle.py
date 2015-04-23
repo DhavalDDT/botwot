@@ -25,8 +25,7 @@ from pyaib.plugins import observe, plugin_class
 @plugin_class
 class UrlTitle(object):
 	def __init__(self, context, config):
-		self.context = context
-		self.domains = context.config.plugin.urltitle.domains
+		pass
 	
 	
 	@observe("IRC_MSG_PRIVMSG")
