@@ -46,7 +46,7 @@ class Feeds(object):
 	
 	@every(30, name='feeds')
 	def feeds(self, context, name):
-		print time.time()
+		
 		for feed_url in context.config.plugin.feeds.feeds:
 			
 			feed = feedparser.parse(feed_url)
