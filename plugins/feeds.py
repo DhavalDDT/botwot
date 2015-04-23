@@ -15,6 +15,7 @@
 # under the License.
 
 import json
+import pprint
 import time
 
 import feedparser
@@ -44,7 +45,7 @@ class Feeds(object):
 		return None
 	
 	
-	@every(30, name='feeds')
+	@every(60, name='feeds')
 	def feeds(self, context, name):
 		
 		for feed_url in context.config.plugin.feeds.feeds:
@@ -52,20 +53,30 @@ class Feeds(object):
 			feed = feedparser.parse(feed_url)
 			for entry in reversed(feed.entries):
 				link = self.submit_link(entry['link'])
+				#link = entry['link']
 				
 				if link:
-					author = entry['author_detail']['name']
 					domain = tldextract.extract(link).domain
 					
-					title = entry['title']
-					if len(title) > 200:
-						title = "%s..." % title[:200]
-					
-					message = "%s on %s: %s - %s" % (author, domain, title, link)
-					context.PRIVMSG(context.config.plugin.feeds.channel, message)
-					
-					# don't flood too hard!
-					time.sleep(1)
+					if domain != "wallflux":
+						message = ""
+						if 'author_detail' in entry and 'name' in entry['author_detail']:
+							title = entry['title']
+							if len(title) > 200:
+								title = "%s..." % title[:200]
+						
+							author = entry['author_detail']['name']
+							message = "%s on %s: %s - %s" % (author, domain, title, link)
+						elif 'summary' in entry:
+							summary = entry['summary']
+							if len(summary) > 200:
+								summary = "%s..." % summary[:200]
+							message = "%s - %s" % (summary, link)
+						
+						context.PRIVMSG(context.config.plugin.feeds.channel, message)
+						
+						# don't flood too hard!
+						time.sleep(1)
 		
 
 
