@@ -1,4 +1,4 @@
-""" Wikipedia Plugin (botwot plugins.wiki) """
+""" WoTMUD Wiki Plugin (botwot plugins.wiki) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #
@@ -14,43 +14,44 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-
 import json
-from urllib import quote
+
 
 import requests
-from pyaib.plugins import keyword
 
-@keyword("wiki")
-def keyword_wiki(context, msg, trigger, args, kargs):
-	""" perform a wikipedia search """
+from pyaib.plugins import keyword, plugin_class
+
+
+@plugin_class
+class Wiki(object):
+	def __init__(self, context, config):
+		pass
 	
-	# figure out first who to target and what the query is
-	target_user = ""
-	query = ""
-	if len(args) >= 3 and args[-2] == "|":
-		target_user = args[-1]
-		query = " ".join(args[:-2])
-	else:
-		target_user = msg.sender
-		query = " ".join(args)
 	
-	# query wikipedia api
-	params = {
-		"format": "json",
-		"action": "query",
-		"list": "search",
-		"srlimit": "1",
-		"srprop": "title",
-		"srsearch": query
-	}
-	search = requests.get("http://en.wikipedia.org/w/api.php", params=params)
-	res = json.loads(search.text)
-	
-	# return result
-	if res["query"]["searchinfo"]["totalhits"] > 0:
-		title = res["query"]["search"][0]["title"]
-		url = "http://en.wikipedia.org/wiki/%s" % quote(title)
-		msg.reply("%s: %s - %s" % (target_user, title, url))
-	else:
-		msg.reply("%s: Nothing found for %s" % (target_user, query))
+	@keyword("wiki")
+	def keyword_wiki(self, context, msg, trigger, args, kargs):
+		"""
+		<query> - Search the WoTMUD Wiki for <query> 
+		"""
+		
+		target_user = ""
+		query = ""
+		if len(args) >= 3 and args[-2] == "|":
+			target_user = args[-1]
+			query = " ".join(args[:-2])
+		else:
+			query = " ".join(args)
+		
+		
+		url = "http://wotmud.wikia.com/api/v1/Search/List"
+		payload = {'query': ' '.join(args), 'limit': 1}
+		r = requests.get(url, params=payload)
+		j = json.loads(r.text)
+		if j and 'items' in j:
+			if target_user:
+				msg.reply("%s: %s" % (target_user, j['items'][0]['url']))
+			else:
+				msg.reply(j['items'][0]['url'])
+
+
+
