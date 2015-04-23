@@ -33,7 +33,6 @@ class UrlTitle(object):
 	def observe_privmsg(self, context, msg):
 		""" Look up HTML titles for URLs """
 		
-		
 		m = re.match(r'(.* )?(?P<url>(https?://)?(www\.)?([a-z0-9\.\-]+\.[a-z0-9]+)\S*)( .*)?', msg.message)
 		if m:
 			# Grab the URL
@@ -45,15 +44,10 @@ class UrlTitle(object):
 			
 			# Get the page and parse it for title and meta description
 			page = requests.get(url)
-			soup = BeautifulSoup(page.text)
-			title = soup.title.string
-			try:
-				desc = " | %s" % soup.findAll(attrs={"name":"description"})[0]['content']
-			except:
-				desc = ""
-			answer = "%s%s" % (title, desc)
-			answer = answer[:256]
-			
-			if answer:
-				msg.reply("%s: %s" % (msg.sender, answer))
+			if page and page.status_code < 400:
+				soup = BeautifulSoup(page.text)
+				if soup:
+					title = soup.title.string[:256]
+					if title:
+						msg.reply("%s: %s" % (msg.sender, title))
 			
