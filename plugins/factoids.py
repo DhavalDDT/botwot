@@ -42,7 +42,10 @@ class Factoids(object):
 		""" <factoid> - Forget <factoid> """
 		
 		if args[0]:
-			self.db.delete(args[0])
+			try:
+				self.db.delete(args[0])
+			except IndexError:
+				pass
 	
 	
 	@observe("IRC_MSG_PRIVMSG")
