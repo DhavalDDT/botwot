@@ -59,7 +59,7 @@ class Feeds(object):
 					entry['author_detail']['name'],
 					title,
 					link)
-				context.PRIVMSG("#wotmud", message)
+				context.PRIVMSG("##wotmud", message)
 		
 
 
