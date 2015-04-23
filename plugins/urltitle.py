@@ -42,7 +42,11 @@ class UrlTitle(object):
 				url = "http://%s" % url
 			
 			# Get the page and parse it for title and meta description
-			page = requests.get(url)
+			try:
+				page = requests.get(url)
+			except InvalidURL:
+				pass
+			
 			if page and page.status_code < 400:
 				soup = BeautifulSoup(page.text)
 				if soup:
