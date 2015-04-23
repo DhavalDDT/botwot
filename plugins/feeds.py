@@ -15,26 +15,25 @@
 # under the License.
 
 import json
+import time
 
 import feedparser
+import requests
+import tldextract
 
 from pyaib.plugins import every, plugin_class
 from pyaib.db import db_driver
-
-import requests
 
 
 @plugin_class
 @plugin_class.requires('db')
 class Feeds(object):
 	def __init__(self, context, config):
-		self.config = config
 		self.context = context
-		self.db = context.db.get('feeds')
 	
 	
 	def submit_link(self, link):
-		url = 'http://wutmod.xyz/+'
+		url = self.context.config.plugin.feeds.short_url
 		data = json.dumps({'url': link})
 		headers = {'Content-Type': 'application/json'}
 		r = requests.post(url, data=data, headers=headers)
@@ -45,21 +44,28 @@ class Feeds(object):
 		return None
 	
 	
-	@every(15, name='feeds')
+	@every(30, name='feeds')
 	def feeds(self, context, name):
-		#for feed_url in self.config.plugin.feeds:
-		feed = feedparser.parse("http://talk.wutmod.xyz/latest.rss")
-		for entry in reversed(feed.entries):
-			link = self.submit_link(entry['link'])
-			if link:
-				title = entry['title']
-				if len(title) > 200:
-					title = "%s..." % title[:200]
-				message = "%s posted %s - %s" % (
-					entry['author_detail']['name'],
-					title,
-					link)
-				context.PRIVMSG("##wotmud", message)
+		print time.time()
+		for feed_url in context.config.plugin.feeds.feeds:
+			
+			feed = feedparser.parse(feed_url)
+			for entry in reversed(feed.entries):
+				link = self.submit_link(entry['link'])
+				
+				if link:
+					author = entry['author_detail']['name']
+					domain = tldextract.extract(link).domain
+					
+					title = entry['title']
+					if len(title) > 200:
+						title = "%s..." % title[:200]
+					
+					message = "%s on %s: %s - %s" % (author, domain, title, link)
+					context.PRIVMSG(context.config.plugin.feeds.channel, message)
+					
+					# don't flood too hard!
+					time.sleep(1)
 		
 
 
