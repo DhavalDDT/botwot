@@ -44,7 +44,7 @@ class UrlTitle(object):
 			# Get the page and parse it for title and meta description
 			try:
 				page = requests.get(url)
-			except InvalidURL:
+			except requests.InvalidURL:
 				pass
 			
 			if page and page.status_code < 400:
