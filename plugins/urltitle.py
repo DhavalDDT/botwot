@@ -44,8 +44,8 @@ class UrlTitle(object):
 			# Get the page and parse it for title and meta description
 			try:
 				page = requests.get(url)
-			except requests.InvalidURL:
-				pass
+			except (requests.exceptions.ConnectionError, requests.exceptions.InvalidURL):
+				return
 			
 			if page and page.status_code < 400:
 				soup = BeautifulSoup(page.text)
