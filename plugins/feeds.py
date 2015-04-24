@@ -64,7 +64,6 @@ class Feeds(object):
 							title = entry['title']
 							if len(title) > 200:
 								title = "%s..." % title[:200]
-						
 							author = entry['author_detail']['name']
 							message = "%s on %s: %s - %s" % (author, domain, title, link)
 						elif 'summary' in entry:
