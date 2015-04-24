@@ -38,7 +38,7 @@ class Factoids(object):
 	
 	
 	@keyword('k')
-	def keyword_kill(self, context, message, trigger, args, kargs):
+	def keyword_kill(self, context, msg, trigger, args, kargs):
 		pass
 	
 	
