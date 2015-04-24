@@ -47,27 +47,28 @@ class Factoids(object):
 		""" Look for karmas """
 		m = re.match(r'(?P<name>\S+)(?P<op>\+\+|--)', msg.message)
 		if m:
-			name = m.groupdict().get("name")
+			name = self.procs(m.groupdict().get("name"))
 			op = m.groupdict().get("op")
 			
-			last_karma = 0
-			item = self.db.get("%s/last" % msg.sender)
-			if item.value:
-				last_karma = float(item.value)
-			
-			if last_karma + random.randint(600, 3600) < time.time():
-				item.value = time.time()
-				item.commit()
-				
-				karma = 0
-				item = self.db.get("%s/karma" % name)
+			if name != self.procs(msg.sender):
+				last_karma = 0
+				item = self.db.get("%s/last" % msg.sender)
 				if item.value:
-					karma = int(item.value)
-				if op == "++":
-					item.value = karma + 1
-				elif op == "--":
-					item.value = karma - 1
-				item.commit()
+					last_karma = float(item.value)
+				
+				if last_karma + random.randint(600, 3600) < time.time():
+					item.value = time.time()
+					item.commit()
+					
+					karma = 0
+					item = self.db.get("%s/karma" % name)
+					if item.value:
+						karma = int(item.value)
+					if op == "++":
+						item.value = karma + 1
+					elif op == "--":
+						item.value = karma - 1
+					item.commit()
 				
 				
 		
