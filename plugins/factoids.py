@@ -14,6 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import string
 
 from pyaib.plugins import keyword, observe, plugin_class
 from pyaib.db import db_driver
@@ -27,12 +28,17 @@ class Factoids(object):
 		self.db = context.db.get("factoids")
 	
 	
+	def procs(self, s):
+		""" strip punctuation and make lower case a string """
+		return "".join(ch for ch in s if ch not in set(string.punctuation)).lower()
+	
+	
 	@keyword("r")
 	def keyword_remember_factoid(self, context, msg, trigger, args, kargs):
 		""" <factoid> <text> - Remember <text> for <factoid> """
 		
 		if len(args) >= 2:
-			item = self.db.get(args[0])
+			item = self.db.get(self.procs(args[0]))
 			item.value = " ".join(args[1:])
 			item.commit()
 	
@@ -42,20 +48,24 @@ class Factoids(object):
 		""" <factoid> - Forget <factoid> """
 		
 		if args[0]:
-			try:
-				self.db.delete(args[0])
-			except IndexError:
-				pass
+			key = self.procs(args[0])
+			if self.db.get(key):
+				self.db.delete(key)
 	
 	
 	@observe("IRC_MSG_PRIVMSG")
 	def observe_privmsg_factoid(self, context, msg):
 		""" Look for factoid queries """
 		
-		if msg.message.startswith("?"):
-			factoid = msg.message.split(" ")[0].lstrip("?")
-			if factoid:
-				item = self.db.get(factoid)
+		if msg.message.startswith("?") and len(msg.message) > 1:
+			args = msg.message.split(" ")
+			key = self.procs(args[0].lstrip("?"))
+			if key:
+				item = self.db.get(key)
 				if item.value:
-					msg.reply("%s: %s" % (msg.sender, item.value))
+					if len(args) >= 3 and args[-2] == "|":
+						target_user = args[-1]
+						msg.reply("%s: %s" % (args[-1], item.value))
+					else:
+						msg.reply(item.value)
 	
