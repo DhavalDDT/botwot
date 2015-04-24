@@ -33,6 +33,15 @@ class Factoids(object):
 		return "".join(ch for ch in s if ch not in set(string.punctuation)).lower()
 	
 	
+	def write_html(self):
+		path = self.context.config.plugin.factoids.output_path
+		with open(path, 'w') as f:
+			f.write("<!doctype html><html><head><title>botwot factoids</title></head><body>\n")
+			for item in self.context.db.getAll("factoids"):
+				f.write("<p><strong>%s:</strong> %s</p>\n" % (item.key, item.value))
+			f.write("</body></html>\n")
+	
+	
 	@keyword("r")
 	def keyword_remember_factoid(self, context, msg, trigger, args, kargs):
 		""" <factoid> <text> - Remember <text> for <factoid> """
@@ -41,6 +50,7 @@ class Factoids(object):
 			item = self.db.get(self.procs(args[0]))
 			item.value = " ".join(args[1:])
 			item.commit()
+			self.write_html()
 	
 	
 	@keyword("f")
@@ -51,6 +61,7 @@ class Factoids(object):
 			key = self.procs(args[0])
 			if self.db.get(key):
 				self.db.delete(key)
+				self.write_html()
 	
 	
 	@observe("IRC_MSG_PRIVMSG")
