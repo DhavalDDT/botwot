@@ -50,7 +50,7 @@ class Factoids(object):
 			name = self.procs(m.groupdict().get("name"))
 			op = m.groupdict().get("op")
 			
-			if name != self.procs(msg.sender):
+			if name != self.procs(msg.sender) and name != self.context.config.nick:
 				last_karma = 0
 				item = self.db.get("%s/last" % msg.sender)
 				if item.value:
