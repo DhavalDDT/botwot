@@ -58,24 +58,23 @@ class Feeds(object):
 				if link:
 					domain = tldextract.extract(link).domain
 					
-					if domain != "wallflux":
-						message = ""
-						if 'author_detail' in entry and 'name' in entry['author_detail']:
-							title = entry['title']
-							if len(title) > 200:
-								title = "%s..." % title[:200]
-							author = entry['author_detail']['name']
-							message = "%s on %s: %s - %s" % (author, domain, title, link)
-						elif 'summary' in entry:
-							summary = entry['summary']
-							if len(summary) > 200:
-								summary = "%s..." % summary[:200]
-							message = "%s - %s" % (summary, link)
-						
-						context.PRIVMSG(context.config.plugin.feeds.channel, message)
-						
-						# don't flood too hard!
-						time.sleep(1)
+					message = ""
+					if 'author_detail' in entry and 'name' in entry['author_detail']:
+						title = entry['title']
+						if len(title) > 200:
+							title = "%s..." % title[:200]
+						author = entry['author_detail']['name']
+						message = "%s on %s: %s - %s" % (author, domain, title, link)
+					elif 'summary' in entry:
+						summary = entry['summary']
+						if len(summary) > 200:
+							summary = "%s..." % summary[:200]
+						message = "%s - %s" % (summary, link)
+					
+					context.PRIVMSG(context.config.plugin.feeds.channel, message)
+					
+					# don't flood too hard!
+					time.sleep(1)
 		
 
 
