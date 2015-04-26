@@ -53,9 +53,9 @@ class Feeds(object):
 			j = json.loads(res.text)
 			for entry in reversed(j['data']):
 				link = self.submit_link(entry['actions'][0]['link'])
-				link2 = entry['actions'][0]['link']
+				#link = entry['actions'][0]['link']
 				
-				if link2:
+				if link:
 					message = "%s posted on Facebook: %s - %s" % (
 						entry['from']['name'],
 						entry['message'] if len(entry['message']) < 200 else "%s ..." % entry['message'][:200],
