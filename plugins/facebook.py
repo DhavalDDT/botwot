@@ -42,8 +42,8 @@ class Feeds(object):
 		return None
 	
 	
-	@every(60, name='feeds')
-	def feeds(self, context, name):
+	@every(60, name='facebook')
+	def facebook(self, context, name):
 		for feed_id in context.config.plugin.facebook.feeds:
 			url = "https://graph.facebook.com/v2.3/%s/feed?access_token=%s|%s" % (
 				feed_id,
