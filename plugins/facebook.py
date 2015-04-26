@@ -1,4 +1,4 @@
-""" feed Plugin (botwot plugins.feeds) """
+""" Facebook Plugin (botwot plugins.facebook) """
 
 # Copyright 2014 Ray Schulz <https://rascul.io>
 #
