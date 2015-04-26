@@ -56,7 +56,7 @@ class Feeds(object):
 				#link = entry['link']
 				
 				if link:
-					domain = tldextract.extract(link).domain
+					domain = tldextract.extract(entry['link']).domain
 					
 					message = ""
 					if 'author_detail' in entry and 'name' in entry['author_detail']:
