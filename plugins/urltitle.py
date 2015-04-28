@@ -49,7 +49,7 @@ class UrlTitle(object):
 			
 			if page and page.status_code < 400:
 				soup = BeautifulSoup(page.text)
-				if soup:
+				if soup and soup.title:
 					title = soup.title.string[:256]
 					if title:
 						msg.reply("%s: %s" % (msg.sender, title))
