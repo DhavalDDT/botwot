@@ -53,6 +53,17 @@ class Factoids(object):
 			self.write_html()
 	
 	
+	@keyword("r+")
+	def keyword_remember_more_factoid(self, context, msg, trigger, args, kargs):
+		""" <factoid> <text> - append <text> to <factoid> """
+		
+		if len(args) >= 2:
+			item = self.db.get(self.procs(args[0]))
+			item.value = "%s %s" % (item.value, " ".join(args[1:]))
+			item.commit()
+			self.write_html()
+	
+	
 	@keyword("f")
 	def keyword_forget_factoid(self, context, msg, trigger, args, kargs):
 		""" <factoid> - Forget <factoid> """
