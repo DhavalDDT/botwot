@@ -58,7 +58,7 @@ def teardown_request(exception):
 		db.close()
 
 
-@app.route('/speaks', methods=['GET'])
+@app.route('/speak', methods=['GET'])
 def get_speak():
 	since = request.form.get('since')
 	cur = g.db.cursor()
