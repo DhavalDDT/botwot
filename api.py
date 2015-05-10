@@ -28,7 +28,7 @@ from flask import Flask, g, make_response, request
 import requests
 
 
-DATABASE = '/tmp/botwot-api.sdb'
+DATABASE = '/home/rascul/botwot/botwot-api.sdb'
 DEBUG = True
 
 app = Flask(__name__)
