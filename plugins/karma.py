@@ -119,8 +119,8 @@ class Factoids(object):
 	@keyword('karma')
 	def keyword_karma(self, context, msg, trigger, args, kargs):
 		""" tell you karmas """
-		karma = self.db.get("%s/karma" % msg.sender) or 0
-		context.PRIVMSG(msg.sender, "You have %s karmas." % karma.value)
+		karma = self.db.get("%s/karma" % msg.sender).value or 0
+		context.PRIVMSG(msg.sender, "You have %s karmas." % karma)
 	
 	
 	@observe("IRC_MSG_PRIVMSG")
