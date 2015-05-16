@@ -110,7 +110,7 @@ class Factoids(object):
 		defender["name"] = args[0]
 		
 		for i in [attacker, defender]:
-			i["karma"] = int(self.db.get("%s/karma" % i["name"]).value) or 0
+			i["karma"] = int(self.db.get("%s/karma" % i["name"]).value or 0)
 			i["abs_karma"] = abs(i["karma"])		
 		
 		status = self.fight(msg, attacker, defender)
