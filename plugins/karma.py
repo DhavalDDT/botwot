@@ -112,7 +112,7 @@ class Karma(object):
 			elif loser["karma"] > 1:
 				loser["karma"] -= 1
 			
-			for i in [winner, loser]:
+			for i in winner, loser:
 				item = self.db.get("%s/karma" % i["name"])
 				item.value = i["karma"]
 				item.commit()
@@ -137,7 +137,7 @@ class Karma(object):
 			msg.reply("%s: You are too exhausted." % msg.sender)
 			return
 				
-		item.value = random.randint(600, 3600) + time.time()
+		item.value = random.randint(180, 1800) + time.time()
 		item.commit()
 		
 		attacker = {}
@@ -163,8 +163,11 @@ class Karma(object):
 	def keyword_karma(self, context, msg, trigger, args, kargs):
 		""" tell you karmas """
 		
-		karma = self.db.get("%s/karma" % msg.sender).value or 0
-		context.PRIVMSG(msg.sender, "You have %s karmas." % karma)
+		karma = self.db.get("%s/karma" % self.procs(msg.sender))
+		context.PRIVMSG(msg.sender, "You have %s karmas." % (karma.value or 0))
+		
+		for i in self.db.getAll():
+			print "%s => %s" % (i.key, i.value)
 	
 	
 	@observe("IRC_MSG_PRIVMSG")
@@ -180,7 +183,7 @@ class Karma(object):
 				item = self.db.get("%s/next_karma" % msg.sender)
 				
 				if (not item.value) or (float(item.value) < time.time()):
-					item.value = random.randint(600, 3600) + time.time()
+					item.value = random.randint(180, 1800) + time.time()
 					item.commit()
 					
 					karma = 0
