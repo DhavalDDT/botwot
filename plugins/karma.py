@@ -165,9 +165,6 @@ class Karma(object):
 		
 		karma = self.db.get("%s/karma" % self.procs(msg.sender))
 		context.PRIVMSG(msg.sender, "You have %s karmas." % (karma.value or 0))
-		
-		for i in self.db.getAll():
-			print "%s => %s" % (i.key, i.value)
 	
 	
 	@observe("IRC_MSG_PRIVMSG")
