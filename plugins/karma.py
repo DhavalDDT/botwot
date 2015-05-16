@@ -137,7 +137,7 @@ class Karma(object):
 			msg.reply("%s: You are too exhausted." % msg.sender)
 			return
 				
-		item.value = random.randint(180, 1800) + time.time()
+		item.value = random.randint(180, 900) + time.time()
 		item.commit()
 		
 		attacker = {}
@@ -180,7 +180,7 @@ class Karma(object):
 				item = self.db.get("%s/next_karma" % msg.sender)
 				
 				if (not item.value) or (float(item.value) < time.time()):
-					item.value = random.randint(180, 1800) + time.time()
+					item.value = random.randint(180, 900) + time.time()
 					item.commit()
 					
 					karma = 0
