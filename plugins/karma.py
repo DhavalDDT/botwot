@@ -80,21 +80,23 @@ class Karma(object):
 	
 	def fight(self, msg, attacker, defender):
 		status = 0
+		reply = ""
 		
 		if self.hit(attacker, defender):
 			status += 1
-			msg.reply("%s %s %s" % (attacker["name"], random.choice(self.damage_types)[1], defender["name"]))
+			reply = "%s %s %s" % (attacker["name"], random.choice(self.damage_types)[1], defender["name"])
 		else:
 			status -= 1
-			msg.reply("%s fails to %s %s" % (attacker["name"], random.choice(self.damage_types)[0], defender["name"]))
+			reply = "%s fails to %s %s" % (attacker["name"], random.choice(self.damage_types)[0], defender["name"])
 		
 		if self.hit(defender, attacker):
 			status -= 1
-			msg.reply("%s %s %s" % (defender["name"], random.choice(self.damage_types)[1], attacker["name"]))
+			reply = "%s; %s %s %s" % (reply, defender["name"], random.choice(self.damage_types)[1], attacker["name"])
 		else:
 			status += 1
-			msg.reply("%s fails to %s %s" % (defender["name"], random.choice(self.damage_types)[0], attacker["name"]))
+			reply = "%s; %s fails to %s %s" % (reply, defender["name"], random.choice(self.damage_types)[0], attacker["name"])
 		
+		msg.reply(reply)
 		return status
 	
 	
