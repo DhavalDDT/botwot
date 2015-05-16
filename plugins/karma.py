@@ -106,8 +106,8 @@ class Factoids(object):
 		attacker = {}
 		defender = {}
 		
-		attacker["name"] = msg.sender
-		defender["name"] = args[0]
+		attacker["name"] = procs(msg.sender)
+		defender["name"] = procs(args[0])
 		
 		for i in [attacker, defender]:
 			i["karma"] = int(self.db.get("%s/karma" % i["name"]).value or 0)
