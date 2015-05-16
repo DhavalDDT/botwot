@@ -24,7 +24,7 @@ from pyaib.db import db_driver
 
 @plugin_class
 @plugin_class.requires('db')
-class Factoids(object):
+class Karma(object):
 	def __init__(self, context, config):
 		self.context = context
 		self.db = context.db.get("karma")
@@ -86,39 +86,83 @@ class Factoids(object):
 			msg.reply("%s %s %s" % (attacker["name"], random.choice(self.damage_types)[1], defender["name"]))
 		else:
 			status -= 1
-			msg.reply("%s fails to %s %s" % (attacker["name"], random.choice(self.damage_types[0]), defender["name"]))
+			msg.reply("%s fails to %s %s" % (attacker["name"], random.choice(self.damage_types)[0], defender["name"]))
 		
 		if self.hit(defender, attacker):
 			status -= 1
 			msg.reply("%s %s %s" % (defender["name"], random.choice(self.damage_types)[1], attacker["name"]))
 		else:
 			status += 1
-			msg.reply("%s fails to %s %s" % (defender["name"], random.choice(self.damage_types[0]), attacker["name"]))
+			msg.reply("%s fails to %s %s" % (defender["name"], random.choice(self.damage_types)[0], attacker["name"]))
 		
 		return status
 	
 	
+	def steal_karma(self, winner, loser):
+		""" chance of winner stealing a karma from the loser """
+		
+		if random.random() <= .4:
+			if winner["karma"] < 0:
+				winner["karma"] -= 1
+			else:
+				winner["karma"] += 1
+			
+			if loser["karma"] < -1:
+				loser["karma"] += 1
+			elif loser["karma"] > 1:
+				loser["karma"] -= 1
+			
+			for i in [winner, loser]:
+				item = self.db.get("%s/karma" % i["name"])
+				item.value = i["karma"]
+				item.commit()
+			
+			return True
+		else:
+			return False
+	
+	
 	@keyword('k')
 	def keyword_kill(self, context, msg, trigger, args, kargs):
+		""" <player> - kill player """
+		
 		if len(args) != 1:
 			return
+		
+		if msg.target != context.config.plugin.karma.channel:
+			return
+		
+		item = self.db.get("%s/next_fight" % msg.sender)
+		if item.value and float(item.value) > time.time():
+			msg.reply("%s: You are too exhausted." % msg.sender)
+			return
+				
+		item.value = random.randint(600, 3600) + time.time()
+		item.commit()
 		
 		attacker = {}
 		defender = {}
 		
-		attacker["name"] = procs(msg.sender)
-		defender["name"] = procs(args[0])
+		attacker["name"] = self.procs(msg.sender)
+		defender["name"] = self.procs(args[0])
 		
 		for i in [attacker, defender]:
 			i["karma"] = int(self.db.get("%s/karma" % i["name"]).value or 0)
 			i["abs_karma"] = abs(i["karma"])
 		
 		status = self.fight(msg, attacker, defender)
+		if status > 0:
+			if self.steal_karma(attacker, defender):
+				msg.reply("%s steals a karma!" % attacker["name"])
+		elif status < 0:
+			if self.steal_karma(defender, attacker):
+				msg.reply("%s steals a karma!" % defender["name"])
 	
 	
 	@keyword('karma')
 	def keyword_karma(self, context, msg, trigger, args, kargs):
 		""" tell you karmas """
+		
 		karma = self.db.get("%s/karma" % msg.sender).value or 0
 		context.PRIVMSG(msg.sender, "You have %s karmas." % karma)
 	
@@ -126,19 +170,17 @@ class Factoids(object):
 	@observe("IRC_MSG_PRIVMSG")
 	def observe_privmsg_karma(self, context, msg):
 		""" Look for karmas """
+		
 		m = re.match(r'(?P<name>\S+)(?P<op>\+\+|--)', msg.message)
 		if m:
 			name = self.procs(m.groupdict().get("name"))
 			op = m.groupdict().get("op")
 			
-			if name != self.procs(msg.sender) and name != self.context.config.nick:
-				last_karma = 0
-				item = self.db.get("%s/last" % msg.sender)
-				if item.value:
-					last_karma = float(item.value)
+			if name != self.procs(msg.sender) and name != context.botnick:
+				item = self.db.get("%s/next_karma" % msg.sender)
 				
-				if last_karma + random.randint(600, 3600) < time.time():
-					item.value = time.time()
+				if (not item.value) or (float(item.value) < time.time()):
+					item.value = random.randint(600, 3600) + time.time()
 					item.commit()
 					
 					karma = 0
@@ -150,10 +192,3 @@ class Factoids(object):
 					elif op == "--":
 						item.value = karma - 1
 					item.commit()
-				
-				
-		
-		
-		
-		
-		
