@@ -91,10 +91,10 @@ class Karma(object):
 		
 		if self.hit(defender, attacker):
 			status -= 1
-			reply = "%s; %s %s %s" % (reply, defender["name"], random.choice(self.damage_types)[1], attacker["name"])
+			reply = "%s  <>  %s %s %s" % (reply, defender["name"], random.choice(self.damage_types)[1], attacker["name"])
 		else:
 			status += 1
-			reply = "%s; %s fails to %s %s" % (reply, defender["name"], random.choice(self.damage_types)[0], attacker["name"])
+			reply = "%s  <>  %s fails to %s %s" % (reply, defender["name"], random.choice(self.damage_types)[0], attacker["name"])
 		
 		msg.reply(reply)
 		return status
