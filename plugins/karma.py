@@ -167,6 +167,21 @@ class Karma(object):
 				msg.reply("%s steals a karma!" % defender["name"])
 	
 	
+	@keyword('title')
+	def keyword_title(self, context, msg, trigger, args, kargs):
+		""" set the title """
+		
+		if len(args) < 1:
+			return
+		
+		name = self.procs(msg.sender)
+		item = self.db.get('%s/title' % name)
+		item.value = ' '.join(args)
+		item.commit()
+		
+		msg.reply("%s: Ok." % msg.sender)
+	
+	
 	@keyword('karma')
 	def keyword_karma(self, context, msg, trigger, args, kargs):
 		""" tell you karmas """
@@ -202,9 +217,13 @@ class Karma(object):
 			return
 		
 		name = self.procs(args[0])
-		item = self.db.get("%s/karma" % name)
 		
+		item = self.db.get("%s/karma" % name)
 		karma = int(item.value or 0)
+		
+		item = self.db.get("%s/title" % name)
+		if item.value:
+			name = ' '.join([name, item.value])
 		
 		if karma < 0:
 			msg.reply("%s serves the Dark." % name)
