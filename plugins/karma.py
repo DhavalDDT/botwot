@@ -166,8 +166,27 @@ class Karma(object):
 	def keyword_karma(self, context, msg, trigger, args, kargs):
 		""" tell you karmas """
 		
-		karma = self.db.get("%s/karma" % self.procs(msg.sender))
-		context.PRIVMSG(msg.sender, "You have %s karmas." % (karma.value or 0))
+		name = self.procs(msg.sender)
+		karma = self.db.get("%s/karma" % name).value or 0
+		
+		if karma == 0:
+			context.PRIVMSG(msg.sender, "You have no karma.")
+		elif karma > 0:
+			context.PRIVMSG(msg.sender, "You have %s karma%s." % (karma, "s" if karma > 1 else ""))
+			context.PRIVMSG(msg.sender, "You serve the Light.")
+		elif karma < 0:
+			context.PRIVMSG(msg.sender, "You have %s karma%s." % (abs(karma), "s" if karma < -1 else ""))
+			context.PRIVMSG(msg.sender, "You serve the Dark.")
+		
+		item = self.db.get("%s/next_karma" % msg.sender)
+		t = time.time()
+		if item.value and int(item.value) > t:
+			context.PRIVMSG(msg.sender, "You can give karma in %s more minutes." % (int(int(item.value) - t) / 60))
+		
+		item = self.db.get("%s/next_fight" % msg.sender)
+		t = time.time()
+		if item.value and int(item.value) > t:
+			context.PRIVMSG(msg.sender, "You are exhausted for %s more minutes." % (int(int(item.value) - t) / 60))
 	
 	
 	@observe("IRC_MSG_PRIVMSG")
