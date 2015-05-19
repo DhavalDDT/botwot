@@ -189,6 +189,26 @@ class Karma(object):
 			context.PRIVMSG(msg.sender, "You are exhausted for %s more minutes." % (int(int(item.value) - t) / 60))
 	
 	
+	@keyword('whois')
+	def keyword_whois(self, context, msg, trigger, args, kargs):
+		""" whois somebody """
+		
+		if len(args) != 1:
+			return
+		
+		name = self.procs(args[0])
+		item = self.db.get("%s/karma" % name)
+		
+		karma = int(item.value or 0)
+		
+		if karma < 0:
+			msg.reply("%s serves the Dark." % name)
+		elif karma > 0:
+			msg.reply("%s serves the Light." % name)
+		else:
+			msg.reply("%s is a %s." % (name, random.choice(["vagabond", "mercenary", "bastard", "wildcard"])))
+	
+	
 	@observe("IRC_MSG_PRIVMSG")
 	def observe_privmsg_karma(self, context, msg):
 		""" Look for karmas """
