@@ -102,16 +102,21 @@ class Karma(object):
 	def steal_karma(self, winner, loser):
 		""" chance of winner stealing a karma from the loser """
 		
-		if random.random() <= .4:
+		chance = .15
+		
+		if (winner["karma"] > 0 > loser["karma"]) or (winner["karma"] < 0 < loser["karma"]):
+			chance = .6
+		
+		if random.random() <= chance:
 			if winner["karma"] < 0:
 				winner["karma"] -= 1
-			else:
+			elif winner["karma"] > 0:
 				winner["karma"] += 1
 			
-			if loser["karma"] < -1:
-				loser["karma"] += 1
-			elif loser["karma"] > 1:
+			if loser["karma"] < 0:
 				loser["karma"] -= 1
+			elif loser["karma"] > 0:
+				loser["karma"] += 1
 			
 			for i in winner, loser:
 				item = self.db.get("%s/karma" % i["name"])
@@ -206,7 +211,34 @@ class Karma(object):
 		elif karma > 0:
 			msg.reply("%s serves the Light." % name)
 		else:
-			msg.reply("%s is a %s." % (name, random.choice(["vagabond", "mercenary", "bastard", "wildcard"])))
+			msg.reply("%s is a %s." % (name, random.choice(["vagabond", "mercenary", "bastard", "wildcard", "failure", "butterfly", "harlot"])))
+	
+	
+	@keyword('align')
+	def keyword_align(self, context, msg, trigger, args, kargs):
+		""" set your alignment """
+		
+		if len(args) != 1:
+			return
+		
+		name = self.procs(msg.sender)
+		align = procs(args[0])
+		item = self.db.get("%s/karma" % name)
+		karma = int(item.value or 0)
+		
+		if align == "light":
+			if karma < 0:
+				karma *= -1
+			elif karma == 0:
+				karma = 1
+		elif align == "dark":
+			if karma > 0:
+				karma *= -1
+			elif karma == 0:
+				karma = -1
+		
+		item.value = karma
+		item.commit()
 	
 	
 	@observe("IRC_MSG_PRIVMSG")
@@ -225,12 +257,19 @@ class Karma(object):
 					item.value = random.randint(180, 900) + time.time()
 					item.commit()
 					
-					karma = 0
 					item = self.db.get("%s/karma" % name)
-					if item.value:
-						karma = int(item.value)
-					if op == "++":
-						item.value = karma + 1
-					elif op == "--":
-						item.value = karma - 1
-					item.commit()
+					karma = int(item.value or 0)
+					abs_karma = abs(karma)
+					
+					if abs_karma > 0:
+						if op == "++":
+							abs_karma += 1
+						elif op == "--":
+							abs_karma -= 1
+						
+						if karma < 0:
+							item.value = abs_karma * -1
+						else:
+							item.value = abs_karma
+						item.commit()
+
