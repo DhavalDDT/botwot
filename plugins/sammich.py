@@ -60,9 +60,9 @@ class Buffalo(object):
 			"sloppy joe"]
 	
 	
-	@keyword("buffalo")
-	def keyword_buffalo(self, context, msg, trigger, args, kargs):
-		""" throw a buffalo """
+	@keyword("sammich")
+	def keyword_sammich(self, context, msg, trigger, args, kargs):
+		""" give out sammiches """
 		
 		target_user = " ".join(args) or msg.sender
 		
