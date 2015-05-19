@@ -78,26 +78,25 @@ class Karma(object):
 				return False
 		
 	
-	def fight(self, msg, attacker, defender):
+	def fight(self, attacker, defender):
 		status = 0
-		reply = ""
+		message = ""
 		
 		if self.hit(attacker, defender):
 			status += 1
-			reply = "%s %s %s" % (attacker["name"], random.choice(self.damage_types)[1], defender["name"])
+			message = "%s %s %s" % (attacker["name"], random.choice(self.damage_types)[1], defender["name"])
 		else:
 			status -= 1
-			reply = "%s fails to %s %s" % (attacker["name"], random.choice(self.damage_types)[0], defender["name"])
+			message = "%s fails to %s %s" % (attacker["name"], random.choice(self.damage_types)[0], defender["name"])
 		
 		if self.hit(defender, attacker):
 			status -= 1
-			reply = "%s  <>  %s %s %s" % (reply, defender["name"], random.choice(self.damage_types)[1], attacker["name"])
+			message = "%s  <>  %s %s %s" % (message, defender["name"], random.choice(self.damage_types)[1], attacker["name"])
 		else:
 			status += 1
-			reply = "%s  <>  %s fails to %s %s" % (reply, defender["name"], random.choice(self.damage_types)[0], attacker["name"])
+			message = "%s  <>  %s fails to %s %s" % (message, defender["name"], random.choice(self.damage_types)[0], attacker["name"])
 		
-		msg.reply(reply)
-		return status
+		return status, message
 	
 	
 	def steal_karma(self, winner, loser):
@@ -152,7 +151,9 @@ class Karma(object):
 			i["karma"] = int(self.db.get("%s/karma" % i["name"]).value or 0)
 			i["abs_karma"] = abs(i["karma"])
 		
-		status = self.fight(msg, attacker, defender)
+		status, message = self.fight(attacker, defender)
+		msg.reply(message)
+		
 		if status > 0:
 			if self.steal_karma(attacker, defender):
 				msg.reply("%s steals a karma!" % attacker["name"])
