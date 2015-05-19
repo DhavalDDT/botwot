@@ -222,7 +222,7 @@ class Karma(object):
 			return
 		
 		name = self.procs(msg.sender)
-		align = procs(args[0])
+		align = self.procs(args[0])
 		item = self.db.get("%s/karma" % name)
 		karma = int(item.value or 0)
 		
@@ -231,11 +231,13 @@ class Karma(object):
 				karma *= -1
 			elif karma == 0:
 				karma = 1
+			msg.reply("%s: You now serve the Light." % msg.sender)
 		elif align == "dark":
 			if karma > 0:
 				karma *= -1
 			elif karma == 0:
 				karma = -1
+			msg.reply("%s: You now serve the Dark." % msg.sender)
 		
 		item.value = karma
 		item.commit()
