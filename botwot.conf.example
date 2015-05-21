@@ -101,7 +101,7 @@ plugin.weather:
 # Factoids plugin
 plugin.factoids:
     # Path for generated html file of factoids
-    output_path: /path/to/docroot/factoids.html
+    output_path: factoids.html
 
 # Weed plugin
 plugin.weed:
