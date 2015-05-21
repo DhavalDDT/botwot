@@ -155,6 +155,9 @@ class Karma(object):
 		for i in [attacker, defender]:
 			i["karma"] = int(self.db.get("%s/karma" % i["name"]).value or 0)
 			i["abs_karma"] = abs(i["karma"])
+			item = self.db.get("%s/title" % i["name"])
+			if item.value:
+				i["name"] = "%s %s" % (i["name"], item.value)
 		
 		status, message = self.fight(attacker, defender)
 		msg.reply(message)
