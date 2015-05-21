@@ -1,0 +1,128 @@
+IRC:
+    # YAML or comma separated list of servers to connect to
+    servers: ssl://chat.freenode.net:7000 
+    
+    # Nick to use
+    nick: dev_botwot
+    
+    # User name
+    user: botwot
+    
+    # Server password
+    #password: testing
+    
+    # Real name
+    realname: botwot
+    
+    # Auto ping interval in seconds
+    auto_ping: 300
+    
+    # Nick of bot admin
+    admin: rascul
+    
+    # Main channel
+    channel: "#botwot"
+    
+    # URL shortener
+    short_url: http://somewhere.com
+
+# Command prefix
+triggers.prefix: !
+
+##################
+# Plugins Config #
+##################
+plugins:
+        # Package for plugins
+        base: plugins
+        
+        # Load these plugins
+        load:
+            - beer
+            - buffalo
+            - chance
+            - cookie
+            - facebook
+            - factoids
+            - feeds
+            - google
+            - insults
+            - jiggle
+            - karma
+            - ping
+            - social
+            - wa
+            - weather
+            - weed
+            - wiki
+            - urltitle
+
+# Pyaib components to load
+components.load: 
+    - db
+    - nickserv
+
+# NickServ
+nickserv:
+    # If you've registered with the nickserv
+    password: nickserv_password
+
+# Database configuration
+db:
+    backend: sqlite
+    driver.sqlite:
+        path: /tmp/botwot.sdb
+
+# Channels to join
+channels:
+    # Store channels in database
+    db: false
+    
+    # Automatically join these channels
+    autojoin:
+        - "#botwot"
+
+# WolframAlpha plugin
+plugin.wa:
+    # App ID from http://products.wolframalpha.com/api/
+    appid: appid
+
+# Social plugin
+plugin.social:
+    # Users allowed to use the social plugin
+    allowed_users:
+        - rascul
+
+# Weather plugin
+plugin.weather:
+    # Api key from http://www.wunderground.com/weather/api/
+    apikey: apikey
+
+# Factoids plugin
+plugin.factoids:
+    # Path for generated html file of factoids
+    output_path: /path/to/docroot/factoids.html
+
+# Weed plugin
+plugin.weed:
+    # Leafly app information from https://developer.leafly.com
+    appid: appid
+    apikey: apikey
+
+# Feeds plugin
+plugin.feeds:
+    # List of feeds
+    feeds:
+        - http://somewhere.com/feed.rss
+
+# Facebook plugin
+plugin.facebook:
+    # Facebook App ID
+    app_id: app_id
+    
+    # Facebook App Secret
+    app_secret: app_secret
+    
+    # Facebook feed IDs
+    feeds:
+        - feed_id
