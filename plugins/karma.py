@@ -135,7 +135,7 @@ class Karma(object):
 		if len(args) != 1:
 			return
 		
-		if msg.target != context.config.plugin.karma.channel:
+		if msg.target != context.config.IRC.channel:
 			return
 		
 		item = self.db.get("%s/next_fight" % msg.sender)

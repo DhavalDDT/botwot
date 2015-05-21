@@ -31,7 +31,7 @@ class Feeds(object):
 	
 	
 	def submit_link(self, link):
-		url = self.context.config.plugin.feeds.short_url
+		url = self.context.config.IRC.short_url
 		data = json.dumps({'url': link})
 		headers = {'Content-Type': 'application/json'}
 		r = requests.post(url, data=data, headers=headers)
@@ -60,7 +60,7 @@ class Feeds(object):
 							entry['from']['name'],
 							entry['message'] if len(entry['message']) < 200 else "%s ..." % entry['message'][:200],
 							link)
-						context.PRIVMSG(context.config.plugin.feeds.channel, message)
+						context.PRIVMSG(context.config.IRC.channel, message)
 						time.sleep(1)
 
 		

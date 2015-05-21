@@ -23,7 +23,7 @@ class Social(object):
 	def __init__(self, context, config):
 		self.context = context
 		self.allowed_users = context.config.plugin.social.allowed_users
-		self.channel = context.config.plugin.social.channel
+		self.channel = context.config.IRC.channel
 	
 	
 	@keyword('emote')
