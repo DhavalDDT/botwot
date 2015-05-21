@@ -198,6 +198,10 @@ class Karma(object):
 			context.PRIVMSG(msg.sender, "You have %s karma%s." % (abs(karma), "s" if karma < -1 else ""))
 			context.PRIVMSG(msg.sender, "You serve the Dark.")
 		
+		item = self.db.get("%s/title" % msg.sender)
+		if item.value:
+			context.PRIVMSG(msg.sender, "You are %s %s." % (msg.sender, item.value))
+		
 		item = self.db.get("%s/next_karma" % msg.sender)
 		t = time.time()
 		if item.value and int(item.value) > t:
