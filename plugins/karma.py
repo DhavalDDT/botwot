@@ -182,7 +182,7 @@ class Karma(object):
 		item.value = ' '.join(args)
 		item.commit()
 		
-		msg.reply("%s: Ok." % msg.sender)
+		msg.reply("%s is now known as %s." % (name, ' '.join([name, item.value])))
 	
 	
 	@keyword('karma')
