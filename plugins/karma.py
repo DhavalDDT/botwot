@@ -282,7 +282,7 @@ class Karma(object):
 					karma = int(item.value or 0)
 					abs_karma = abs(karma)
 					
-					if abs_karma > 0:
+					if abs_karma >= 0:
 						if op == "++":
 							abs_karma += 1
 						elif op == "--":
