@@ -110,13 +110,13 @@ class Karma(object):
 		if random.random() <= chance:
 			if winner["karma"] < 0:
 				winner["karma"] -= 1
-			elif winner["karma"] > 0:
+			elif winner["karma"] >= 0:
 				winner["karma"] += 1
 			
-			if loser["karma"] < 0:
-				loser["karma"] -= 1
-			elif loser["karma"] > 0:
+			if loser["karma"] < -1:
 				loser["karma"] += 1
+			elif loser["karma"] > 1:
+				loser["karma"] -= 1
 			
 			for i in winner, loser:
 				item = self.db.get("%s/karma" % i["name"])
