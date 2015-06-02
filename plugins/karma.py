@@ -22,6 +22,7 @@ import time
 from pyaib.plugins import keyword, observe, plugin_class
 from pyaib.db import db_driver
 
+
 @plugin_class
 @plugin_class.requires('db')
 class Karma(object):
@@ -46,7 +47,14 @@ class Karma(object):
 			["sting", "stings"],
 			["strike", "strikes"],
 			["whip", "whips"]]
-		
+		self.unaligned = (
+			"vagabond",
+			"mercenary",
+			"bastard",
+			"wildcard",
+			"failure",
+			"butterfly",
+			"harlot")
 		
 		random.seed()
 	
@@ -70,7 +78,7 @@ class Karma(object):
 		elif total - defender["abs_karma"] < res <= total:
 			return False
 		else:
-			if random.choice([attacker, defender]) == attacker:
+			if random.choice((attacker, defender)) == attacker:
 				return True
 			else:
 				return False
@@ -104,7 +112,7 @@ class Karma(object):
 		
 		chance = .15
 		
-		if (winner["karma"] > 0 > loser["karma"]) or (winner["karma"] < 0 < loser["karma"]):
+		if winner["karma"] > 0 > loser["karma"] or winner["karma"] < 0 < loser["karma"]:
 			chance = .6
 		
 		if random.random() <= chance:
@@ -152,7 +160,7 @@ class Karma(object):
 		attacker["bare_name"] = attacker["name"] = self.procs(msg.sender)
 		defender["bare_name"] = defender["name"] = self.procs(args[0])
 		
-		for i in [attacker, defender]:
+		for i in attacker, defender:
 			i["karma"] = int(self.db.get("%s/karma" % i["name"]).value or 0)
 			i["abs_karma"] = abs(i["karma"])
 			item = self.db.get("%s/title" % i["name"])
@@ -256,7 +264,7 @@ class Karma(object):
 		elif karma > 0:
 			msg.reply("%s serves the Light." % name)
 		else:
-			msg.reply("%s is a %s." % (name, random.choice(["vagabond", "mercenary", "bastard", "wildcard", "failure", "butterfly", "harlot"])))
+			msg.reply("%s is a %s." % (name, random.choice(self.unaligned)))
 	
 	
 	@keyword('align')
