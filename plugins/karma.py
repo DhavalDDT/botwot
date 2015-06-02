@@ -53,14 +53,12 @@ class Karma(object):
 	
 	def procs(self, s):
 		""" strip punctuation and make lower case a string """
+		
 		return "".join(ch for ch in s if ch not in set(string.punctuation)).lower()
 	
 	
 	def hit(self, attacker, defender):
-		""" 
-		hit somebody
-		return true if attacker hits defender, else false
-		"""
+		""" return true if attacker hits defender, else false """
 		
 		total = attacker["abs_karma"] + attacker["abs_karma"] / 2 + defender["abs_karma"] + defender["abs_karma"] / 2
 		total = total + 10 if total < 20 else total
@@ -79,6 +77,8 @@ class Karma(object):
 		
 	
 	def fight(self, attacker, defender):
+		""" get into a fight """
+		
 		status = 0
 		message = ""
 		
@@ -130,7 +130,7 @@ class Karma(object):
 	
 	@keyword('k')
 	def keyword_kill(self, context, msg, trigger, args, kargs):
-		""" <player> - kill player """
+		""" <player> - kill <player> """
 		
 		if len(args) != 1:
 			return
@@ -172,7 +172,7 @@ class Karma(object):
 	
 	@keyword('title')
 	def keyword_title(self, context, msg, trigger, args, kargs):
-		""" set the title """
+		""" <text> - set your title to <text> """
 		
 		if len(args) < 1:
 			return
@@ -187,7 +187,7 @@ class Karma(object):
 	
 	@keyword('karma')
 	def keyword_karma(self, context, msg, trigger, args, kargs):
-		""" tell you karmas """
+		""" - message your karma statistics """
 		
 		name = self.procs(msg.sender)
 		karma = self.db.get("%s/karma" % name).value or 0
@@ -218,7 +218,7 @@ class Karma(object):
 	
 	@keyword('whois')
 	def keyword_whois(self, context, msg, trigger, args, kargs):
-		""" whois somebody """
+		""" <player> - show information about <player> """
 		
 		if len(args) != 1:
 			return
@@ -242,7 +242,7 @@ class Karma(object):
 	
 	@keyword('align')
 	def keyword_align(self, context, msg, trigger, args, kargs):
-		""" set your alignment """
+		""" <side> - set your alignment to either light or dark """
 		
 		if len(args) != 1:
 			return
