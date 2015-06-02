@@ -29,24 +29,24 @@ class Karma(object):
 	def __init__(self, context, config):
 		self.context = context
 		self.db = context.db.get("karma")
-		self.damage_types = [
-			["blast", "blasts"],
-			["cleave", "cleaves"],
-			["crush", "crushes"],
-			["hack", "hacks"],
-			["hit", "hits"],
-			["lance", "lances"],
-			["pierce", "pierces"],
-			["pound", "pounds"],
-			["scythe", "scythes"],
-			["shoot", "shoots"],
-			["slash", "slashes"],
-			["slice", "slices"],
-			["smite", "smites"],
-			["stab", "stabs"],
-			["sting", "stings"],
-			["strike", "strikes"],
-			["whip", "whips"]]
+		self.damage_types = (
+			("blast", "blasts"),
+			("cleave", "cleaves"),
+			("crush", "crushes"),
+			("hack", "hacks"),
+			("hit", "hits"),
+			("lance", "lances"),
+			("pierce", "pierces"),
+			("pound", "pounds"),
+			("scythe", "scythes"),
+			("shoot", "shoots"),
+			("slash", "slashes"),
+			("slice", "slices"),
+			("smite", "smites"),
+			("stab", "stabs"),
+			("sting", "stings"),
+			("strike", "strikes"),
+			("whip", "whips"))
 		self.unaligned = (
 			"vagabond",
 			"mercenary",
