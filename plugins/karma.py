@@ -119,7 +119,7 @@ class Karma(object):
 				loser["karma"] -= 1
 			
 			for i in winner, loser:
-				item = self.db.get("%s/karma" % i["name"])
+				item = self.db.get("%s/karma" % i["bare_name"])
 				item.value = i["karma"]
 				item.commit()
 			
@@ -149,8 +149,8 @@ class Karma(object):
 		attacker = {}
 		defender = {}
 		
-		attacker["name"] = self.procs(msg.sender)
-		defender["name"] = self.procs(args[0])
+		attacker["bare_name"] = attacker["name"] = self.procs(msg.sender)
+		defender["bare_name"] = defender["name"] = self.procs(args[0])
 		
 		for i in [attacker, defender]:
 			i["karma"] = int(self.db.get("%s/karma" % i["name"]).value or 0)
