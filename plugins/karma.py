@@ -162,12 +162,25 @@ class Karma(object):
 		status, message = self.fight(attacker, defender)
 		msg.reply(message)
 		
+		run = ""
+		
 		if status > 0:
+			run = [attacker, "wins"], [defender, "losses"]
 			if self.steal_karma(attacker, defender):
 				msg.reply("%s steals a karma!" % attacker["name"])
 		elif status < 0:
+			run = [defender, "wins"], [attacker, "losses"]
 			if self.steal_karma(defender, attacker):
 				msg.reply("%s steals a karma!" % defender["name"])
+		else:
+			run = [attacker, "ties"], [defender, "ties"]
+		
+		for i, j in run:
+			item = self.db.get("%s/fights" % i["bare_name"])
+			fights = item.value or dict()
+			fights[j] = fights[j] + 1 if j in fights else 1
+			item.value = fights
+			item.commit()
 	
 	
 	@keyword('title')
@@ -200,6 +213,12 @@ class Karma(object):
 		elif karma < 0:
 			context.PRIVMSG(msg.sender, "You have %s karma%s." % (abs(karma), "s" if karma < -1 else ""))
 			context.PRIVMSG(msg.sender, "You serve the Dark.")
+		
+		item = self.db.get("%s/fights" % name)
+		fights = item.value or dict()
+		if fights:
+			context.PRIVMSG(msg.sender, "You have %s wins, %s losses and %s ties." % 
+				(fights.get("wins", 0), fights.get("losses", 0), fights.get("ties", 0)))
 		
 		item = self.db.get("%s/title" % msg.sender)
 		if item.value:
