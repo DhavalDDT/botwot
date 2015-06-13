@@ -54,17 +54,17 @@ DAMAGE_TYPES = (
 	("whip", "whips"))
 
 UNALIGNED_NAMES = (
-	"vagabond",
-	"mercenary",
 	"bastard",
-	"wildcard",
-	"failure",
 	"butterfly",
+	"eunuch",
+	"failure",
 	"harlot",
-	"noobie",
-	"newt",
+	"mercenary",
 	"mystery",
-	"eunuch")
+	"newt",
+	"noobie",
+	"vagabond",
+	"wildcard")
 
 
 @plugin_class
