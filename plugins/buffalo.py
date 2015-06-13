@@ -44,7 +44,7 @@ class Buffalo(object):
 	
 	@keyword("buffalo")
 	def keyword_buffalo(self, context, msg, trigger, args, kargs):
-		""" throw a buffalo """
+		""" [<player>] :: Throw a buffalo. """
 		
 		target_user = " ".join(args) or msg.sender
 		
