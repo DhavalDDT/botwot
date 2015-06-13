@@ -46,8 +46,8 @@ class Buffalo(object):
 	def keyword_buffalo(self, context, msg, trigger, args, kargs):
 		""" [<player>] :: Throw a buffalo. """
 		
-		target_user = " ".join(args) or msg.sender
+		player = " ".join(args) or msg.sender
 		
 		context.PRIVMSG(
 			msg.channel or msg.sender, 
-			"\x01ACTION throws %s buffalo at %s\x01" % (random.choice(BUFFALOS), target_user))
+			"\x01ACTION throws %s buffalo at %s\x01" % (random.choice(BUFFALOS), player))
