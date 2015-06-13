@@ -20,23 +20,26 @@ import random
 from pyaib.plugins import keyword, plugin_class
 
 
+BUFFALOS = (
+	"a decrepit",
+	"a delicious",
+	"a fat",
+	"a healthy",
+	"a large",
+	"an old",
+	"an oversized",
+	"a sickly",
+	"a skinny",
+	"a small",
+	"a smelly",
+	"a young",
+	"a wildly winged")
+
+
 @plugin_class
 class Buffalo(object):
 	def __init__(self, context, config):
-		self.buffalos = [
-			"a large",
-			"a small",
-			"a fat",
-			"an old",
-			"a smelly",
-			"a decrepit",
-			"a young",
-			"a healthy",
-			"a delicious",
-			"an oversized",
-			"a skinny",
-			"a sickly",
-			"a wildly winged"]
+		pass
 	
 	
 	@keyword("buffalo")
@@ -47,4 +50,4 @@ class Buffalo(object):
 		
 		context.PRIVMSG(
 			msg.channel or msg.sender, 
-			"\x01ACTION throws %s buffalo at %s\x01" % (random.choice(self.buffalos), target_user))
+			"\x01ACTION throws %s buffalo at %s\x01" % (random.choice(BUFFALOS), target_user))
