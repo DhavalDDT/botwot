@@ -50,4 +50,4 @@ class Buffalo(object):
 		
 		context.PRIVMSG(
 			msg.channel or msg.sender, 
-			"\x01ACTION throws %s buffalo at %s\x01" % (random.choice(BUFFALOS), player))
+			"\x01ACTION throws %s buffalo at %s.\x01" % (random.choice(BUFFALOS), player))
