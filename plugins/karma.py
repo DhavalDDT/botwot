@@ -14,317 +14,365 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+
 import random
 import re
 import string
 import time
 
-from pyaib.plugins import keyword, observe, plugin_class
 from pyaib.db import db_driver
+from pyaib.plugins import keyword, observe, plugin_class
+from pyaib.util import data
+
+
+ALIGNMENT_LIGHT = 1
+ALIGNMENT_NEUTRAL = 0
+ALIGNMENT_DARK = -1
+
+DAMAGE_TYPES = (
+	("blast", "blasts"),
+	("cleave", "cleaves"),
+	("crush", "crushes"),
+	("flap", "flaps"),
+	("hack", "hacks"),
+	("hit", "hits"),
+	("lance", "lances"),
+	("pierce", "pierces"),
+	("pound", "pounds"),
+	("poke", "pokes"),
+	("punch", "punches"),
+	("scythe", "scythes"),
+	("shoot", "shoots"),
+	("slap", "slaps"),
+	("slash", "slashes"),
+	("slice", "slices"),
+	("smash", "smashes"),
+	("smite", "smites"),
+	("stab", "stabs"),
+	("sting", "stings"),
+	("strike", "strikes"),
+	("whip", "whips"))
+
+UNALIGNED_NAMES = (
+	"vagabond",
+	"mercenary",
+	"bastard",
+	"wildcard",
+	"failure",
+	"butterfly",
+	"harlot",
+	"noobie",
+	"newt",
+	"mystery",
+	"eunuch")
 
 
 @plugin_class
 @plugin_class.requires('db')
 class Karma(object):
+	""" Karma operations """
+	
 	def __init__(self, context, config):
+		""" Initialize the karma plugin. """
+		
 		self.context = context
 		self.db = context.db.get("karma")
-		self.damage_types = (
-			("blast", "blasts"),
-			("cleave", "cleaves"),
-			("crush", "crushes"),
-			("hack", "hacks"),
-			("hit", "hits"),
-			("lance", "lances"),
-			("pierce", "pierces"),
-			("pound", "pounds"),
-			("scythe", "scythes"),
-			("shoot", "shoots"),
-			("slash", "slashes"),
-			("slice", "slices"),
-			("smite", "smites"),
-			("stab", "stabs"),
-			("sting", "stings"),
-			("strike", "strikes"),
-			("whip", "whips"))
-		self.unaligned = (
-			"vagabond",
-			"mercenary",
-			"bastard",
-			"wildcard",
-			"failure",
-			"butterfly",
-			"harlot")
 		
 		random.seed()
 	
 	
-	def procs(self, s):
-		""" strip punctuation and make lower case a string """
+	def get_player(self, name):
+		""" Retrieve a player's information from the db, or create a new player. """
 		
-		return "".join(ch for ch in s if ch not in set(string.punctuation)).lower()
-	
-	
-	def hit(self, attacker, defender):
-		""" return true if attacker hits defender, else false """
+		name = "".join(ch.lower() for ch in name if ch not in set(string.punctuation)).capitalize()
+		item = self.db.get(name)
 		
-		total = attacker["abs_karma"] + attacker["abs_karma"] / 2 + defender["abs_karma"] + defender["abs_karma"] / 2
-		total = total + 10 if total < 20 else total
-		
-		res = random.randint(1, total)
-		
-		if res <= attacker["abs_karma"]:
-			return True
-		elif total - defender["abs_karma"] < res <= total:
-			return False
+		if item.value:
+			item.value = data.Object(item.value)
 		else:
-			if random.choice((attacker, defender)) == attacker:
-				return True
-			else:
-				return False
-		
-	
-	def fight(self, attacker, defender):
-		""" get into a fight """
-		
-		status = 0
-		message = ""
-		
-		if self.hit(attacker, defender):
-			status += 1
-			message = "%s %s %s" % (attacker["name"], random.choice(self.damage_types)[1], defender["name"])
-		else:
-			status -= 1
-			message = "%s fails to %s %s" % (attacker["name"], random.choice(self.damage_types)[0], defender["name"])
-		
-		if self.hit(defender, attacker):
-			status -= 1
-			message = "%s  <>  %s %s %s" % (message, defender["name"], random.choice(self.damage_types)[1], attacker["name"])
-		else:
-			status += 1
-			message = "%s  <>  %s fails to %s %s" % (message, defender["name"], random.choice(self.damage_types)[0], attacker["name"])
-		
-		return status, message
-	
-	
-	def steal_karma(self, winner, loser):
-		""" chance of winner stealing a karma from the loser """
-		
-		chance = .15
-		
-		if winner["karma"] > 0 > loser["karma"] or winner["karma"] < 0 < loser["karma"]:
-			chance = .6
-		
-		if random.random() <= chance:
-			if winner["karma"] < 0:
-				winner["karma"] -= 1
-			elif winner["karma"] >= 0:
-				winner["karma"] += 1
+			player = data.Object()
 			
-			if loser["karma"] < -1:
-				loser["karma"] += 1
-			elif loser["karma"] > 1:
-				loser["karma"] -= 1
+			player.name = name
+			player.title = ""
+			player.full_name = name
+			player.karma = 0
+			player.alignment = ALIGNMENT_NEUTRAL
+			player.unaligned_name = random.choice(UNALIGNED_NAMES)
+			player.damage = random.choice(DAMAGE_TYPES)
+			player.next_karma = 0
+			player.next_fight = 0
+			player.wins = 0
+			player.losses = 0
+			player.ties = 0
 			
-			for i in winner, loser:
-				item = self.db.get("%s/karma" % i["bare_name"])
-				item.value = i["karma"]
-				item.commit()
-			
-			return True
-		else:
-			return False
-	
-	
-	@keyword('k')
-	def keyword_kill(self, context, msg, trigger, args, kargs):
-		""" <player> - kill <player> """
-		
-		if len(args) != 1:
-			return
-		
-		if msg.target != context.config.IRC.channel:
-			return
-		
-		item = self.db.get("%s/next_fight" % msg.sender)
-		if item.value and float(item.value) > time.time():
-			msg.reply("%s: You are too exhausted." % msg.sender)
-			return
-				
-		item.value = random.randint(180, 900) + time.time()
-		item.commit()
-		
-		attacker = {}
-		defender = {}
-		
-		attacker["bare_name"] = attacker["name"] = self.procs(msg.sender)
-		defender["bare_name"] = defender["name"] = self.procs(args[0])
-		
-		for i in attacker, defender:
-			i["karma"] = int(self.db.get("%s/karma" % i["name"]).value or 0)
-			i["abs_karma"] = abs(i["karma"])
-			item = self.db.get("%s/title" % i["name"])
-			if item.value:
-				i["name"] = "%s %s" % (i["name"], item.value)
-		
-		status, message = self.fight(attacker, defender)
-		msg.reply(message)
-		
-		run = ""
-		
-		if status > 0:
-			run = [attacker, "wins"], [defender, "losses"]
-			if self.steal_karma(attacker, defender):
-				msg.reply("%s steals a karma!" % attacker["name"])
-		elif status < 0:
-			run = [defender, "wins"], [attacker, "losses"]
-			if self.steal_karma(defender, attacker):
-				msg.reply("%s steals a karma!" % defender["name"])
-		else:
-			run = [attacker, "ties"], [defender, "ties"]
-		
-		for i, j in run:
-			item = self.db.get("%s/fights" % i["bare_name"])
-			fights = item.value or dict()
-			fights[j] = fights[j] + 1 if j in fights else 1
-			item.value = fights
+			item.value = player
 			item.commit()
-	
-	
-	@keyword('title')
-	def keyword_title(self, context, msg, trigger, args, kargs):
-		""" <text> - set your title to <text> """
 		
-		if len(args) < 1:
-			return
-		
-		name = self.procs(msg.sender)
-		item = self.db.get('%s/title' % name)
-		item.value = ' '.join(args)
-		item.commit()
-		
-		msg.reply("%s is now known as %s." % (name, item.value))
-	
-	
-	@keyword('karma')
-	def keyword_karma(self, context, msg, trigger, args, kargs):
-		""" - message your karma statistics """
-		
-		name = self.procs(msg.sender)
-		karma = self.db.get("%s/karma" % name).value or 0
-		
-		if karma == 0:
-			context.PRIVMSG(msg.sender, "You have no karma.")
-		elif karma > 0:
-			context.PRIVMSG(msg.sender, "You have %s karma%s." % (karma, "s" if karma > 1 else ""))
-			context.PRIVMSG(msg.sender, "You serve the Light.")
-		elif karma < 0:
-			context.PRIVMSG(msg.sender, "You have %s karma%s." % (abs(karma), "s" if karma < -1 else ""))
-			context.PRIVMSG(msg.sender, "You serve the Dark.")
-		
-		item = self.db.get("%s/fights" % name)
-		fights = item.value or dict()
-		if fights:
-			context.PRIVMSG(msg.sender, "You have %s wins, %s losses and %s ties." % 
-				(fights.get("wins", 0), fights.get("losses", 0), fights.get("ties", 0)))
-		
-		item = self.db.get("%s/title" % msg.sender)
-		if item.value:
-			context.PRIVMSG(msg.sender, "You are %s %s." % (msg.sender, item.value))
-		
-		item = self.db.get("%s/next_karma" % msg.sender)
-		t = time.time()
-		if item.value and int(item.value) > t:
-			context.PRIVMSG(msg.sender, "You can give karma in %s more minutes." % (int(int(item.value) - t) / 60))
-		
-		item = self.db.get("%s/next_fight" % msg.sender)
-		t = time.time()
-		if item.value and int(item.value) > t:
-			context.PRIVMSG(msg.sender, "You are exhausted for %s more minutes." % (int(int(item.value) - t) / 60))
-	
-	
-	@keyword('whois')
-	def keyword_whois(self, context, msg, trigger, args, kargs):
-		""" <player> - show information about <player> """
-		
-		if len(args) != 1:
-			return
-		
-		name = self.procs(args[0])
-		
-		item = self.db.get("%s/karma" % name)
-		karma = int(item.value or 0)
-		
-		item = self.db.get("%s/title" % name)
-		if item.value:
-			name = ' '.join([name, item.value])
-		
-		if karma < 0:
-			msg.reply("%s serves the Dark." % name)
-		elif karma > 0:
-			msg.reply("%s serves the Light." % name)
-		else:
-			msg.reply("%s is a %s." % (name, random.choice(self.unaligned)))
+		return item
 	
 	
 	@keyword('align')
 	def keyword_align(self, context, msg, trigger, args, kargs):
-		""" <side> - set your alignment to either light or dark """
+		""" [light|neutral|dark] :: Set or show your alignment. """
 		
-		if len(args) != 1:
-			return
+		player = self.get_player(msg.sender)
 		
-		name = self.procs(msg.sender)
-		align = self.procs(args[0])
-		item = self.db.get("%s/karma" % name)
-		karma = int(item.value or 0)
-		
-		if align == "light":
-			if karma < 0:
-				karma *= -1
-			elif karma == 0:
-				karma = 1
-			msg.reply("%s: You now serve the Light." % msg.sender)
-		elif align == "dark":
-			if karma > 0:
-				karma *= -1
-			elif karma == 0:
-				karma = -1
-			msg.reply("%s: You now serve the Dark." % msg.sender)
-		
-		item.value = karma
-		item.commit()
+		if args:
+			if args[0].lower() == "light":
+				player.value.alignment = ALIGNMENT_LIGHT
+				player.value.alignment = ALIGNMENT_LIGHT
+				player.commit()
+				msg.reply("%s now serves the Light." % player.value.full_name)
+			elif args[0].lower() == "neutral":
+				player.value.alignment = ALIGNMENT_NEUTRAL
+				player.value.unaligned_name = random.choice(UNALIGNED_NAMES)
+				player.commit()
+				msg.reply("%s is now a %s." % (player.value.full_name, player.value.unaligned_name))
+			elif args[0].lower() == "dark":
+				player.value.alignment = ALIGNMENT_DARK
+				player.commit()
+				msg.reply("%s now serves the Dark." % player.value.full_name)
+			else:
+				msg.reply("%s is not an alignment." % args[0])
+		else:
+			if player.value.alignment == ALIGNMENT_LIGHT:
+				msg.reply("%s serves the Light." % player.value.full_name)
+			elif player.value.alignment == ALIGNMENT_NEUTRAL:
+				msg.reply("%s is a %s." % (player.value.full_name, player.value.unaligned_name))
+			elif player.value.alignment == ALIGNMENT_DARK:
+				msg.reply("%s serves the Dark." % player.value.full_name)
 	
 	
-	@observe("IRC_MSG_PRIVMSG")
-	def observe_privmsg_karma(self, context, msg):
-		""" Look for karmas """
+	@keyword('con')
+	def keyword_con(self, context, msg, trigger, args, kargs):
+		""" <player> :: Consider another player. """
 		
-		m = re.match(r'(?P<name>\S+)(?P<op>\+\+|--)', msg.message)
-		if m:
-			name = self.procs(m.groupdict().get("name"))
-			op = m.groupdict().get("op")
+		if not args:
+			msg.reply("Who do you want to consider?")
+		else:
+			player = self.get_player(msg.sender)
+			target_player = self.get_player(args[0])
 			
-			if name != self.procs(msg.sender) and name != context.botnick:
-				item = self.db.get("%s/next_karma" % msg.sender)
+			if player.value.name == target_player.value.name:
+				msg.reply("You can't consider yourself!")
+			else:
+				if player.value.karma <= target_player.value.karma - 30:
+					msg.reply("You are much weaker than %s." % target_player.value.full_name)
+				elif player.value.karma <= target_player.value.karma - 5:
+					msg.reply("You are weaker than %s." % target_player.value.full_name)
+				elif player.value.karma >= target_player.value.karma + 30:
+					msg.reply("You are much stronger than %s." % target_player.value.full_name)
+				elif player.value.karma >= target_player.value.karma + 5:
+					msg.reply("You are stronger than %s." % target_player.value.full_name)
+				else:
+					msg.reply("You are about as strong as %s." % target_player.value.full_name)
+	
+	
+	@keyword('damage')
+	def keyword_damage(self, context, msg, trigger, args, kargs):
+		""" [--types] [<type>] :: Set or view damage types """
+		
+		if "types" in kargs:
+			msg.reply("Damage types are: %s" % ", ".join(t[0] for t in DAMAGE_TYPES))
+		elif args:
+			player = self.get_player(msg.sender)
+			for t in DAMAGE_TYPES:
+				if args[0] == t[0]:
+					player.value.damage = t
+					player.commit()
+					msg.reply("%s now %s." % (player.value.full_name, player.value.damage[1]))
+					break
+		else:
+			player = self.get_player(msg.sender)
+			msg.reply("%s %s." % (player.value.full_name, player.value.damage[1]))
+	
+	
+	@keyword('k')
+	def keyword_k(self, context, msg, trigger, args, kargs):
+		""" <player> :: Attack <player>. """
+		
+		if msg.target == context.config.IRC.channel:
+			if args:
+				player = self.get_player(msg.sender)
+				target_player = self.get_player(args[0])
 				
-				if (not item.value) or (float(item.value) < time.time()):
-					item.value = random.randint(180, 900) + time.time()
-					item.commit()
+				if player.value.name == target_player.value.name:
+					msg.reply("Suicide is not allowed.")
+				elif player.value.next_fight > time.time():
+					msg.reply("You are too exhausted.")
+				else:
+					total = round(player.value.karma * 1.5) + round(target_player.value.karma * 1.5)
+					if total < 10:
+						total += 10
+					message = ""
+					res = []
 					
-					item = self.db.get("%s/karma" % name)
-					karma = int(item.value or 0)
-					abs_karma = abs(karma)
-					
-					if abs_karma >= 0:
-						if op == "++":
-							abs_karma += 1
-						elif op == "--":
-							abs_karma -= 1
-						
-						if karma < 0:
-							item.value = abs_karma * -1
+					for attacker, defender in (player, target_player), (target_player, player):
+						hit = random.randint(1, total)
+						if hit <= int(attacker.value.karma):
+							message += "%s %s %s" % (attacker.value.full_name, attacker.value.damage[1], defender.value.full_name)
+							res.append(attacker)
+						elif total - int(defender.value.karma) < hit <= total:
+							message += "%s fails to %s %s" % (attacker.value.full_name, attacker.value.damage[0], defender.value.full_name)
+							res.append(defender)
+						elif random.choice((attacker, defender)) == attacker:
+							message += "%s %s %s" % (attacker.value.full_name, attacker.value.damage[1], defender.value.full_name)
+							res.append(attacker)
 						else:
-							item.value = abs_karma
-						item.commit()
-
+							message += "%s fails to %s %s" % (attacker.value.full_name, attacker.value.damage[0], defender.value.full_name)
+							res.append(defender)
+						
+						if attacker == player:
+							message += "  <>  "
+					
+					msg.reply(message)
+					
+					if res[0] == res[1]:
+						winner, loser = (player, target_player) if res[0] == player else (target_player, player)
+						
+						winner.value.next_fight = random.randint(180, 900) + time.time()
+						loser.value.next_fight = 0
+						
+						winner.value.wins += 1
+						loser.value.losses += 1
+						
+						if winner.value.alignment != ALIGNMENT_NEUTRAL:
+							chance = .15 if winner.value.alignment == loser.value.alignment else .65
+							if random.random() <= chance:
+								if loser.value.karma >= 1:
+									winner.value.karma += 1
+									loser.value.karma -= 1
+									msg.reply("%s steals a karma!" % winner.value.full_name)
+						
+						winner.commit()
+						loser.commit()
+					else:
+						player.value.next_fight = random.randint(180, 900) + time.time()
+						
+						player.value.ties += 1
+						target_player.value.ties += 1
+						
+						player.commit()
+						target_player.commit()
+					
+			else:
+				msg.reply("Who do you want to attack?")
+		else:
+			msg.reply("This is not a PK area.")
+	
+	
+	@keyword('karma')
+	def keyword_karma(self, context, msg, trigger, args, kargs):
+		""" :: Send a private message with karma statistics. """
+		
+		player = self.get_player(msg.sender)
+		
+		context.PRIVMSG(msg.sender, "You are known as %s." % player.value.full_name)
+		
+		if player.value.alignment == ALIGNMENT_LIGHT:
+			context.PRIVMSG(msg.sender, "You serve the Light.")
+		elif player.value.alignment == ALIGNMENT_NEUTRAL:
+			context.PRIVMSG(msg.sender, "You are a %s." % player.value.unaligned_name)
+		elif player.value.alignment == ALIGNMENT_DARK:
+			context.PRIVMSG(msg.sender, "You serve the Dark.")
+		
+		context.PRIVMSG(msg.sender, "You %s." % player.value.damage[0])
+		
+		if int(player.value.karma) <= 1:
+			context.PRIVMSG(msg.sender, "You have %s karma." % int(player.value.karma))
+		else:
+			context.PRIVMSG(msg.sender, "You have %s karmas." % int(player.value.karma))
+		
+		if player.value.wins or player.value.losses or player.value.ties:
+			context.PRIVMSG(msg.sender, "Your record is %s/%s/%s (wins/losses/ties)" % (player.value.wins, player.value.losses, player.value.ties))
+		
+		t = time.time()
+		
+		if player.value.next_fight > t:
+			n = int((player.value.next_fight - t) / 60)
+			
+			if n > 1:
+				context.PRIVMSG(msg.sender, "You may attack another player in %s minutes." % n)
+			elif n == 1:
+				context.PRIVMSG(msg.sender, "You may attack another player in 1 minute.")
+			else:
+				context.PRIVMSG(msg.sender, "You may attack another player in less than a minute.")
+		
+		if player.value.next_karma > t:
+			n = int((player.value.next_karma - t) / 60)
+			
+			if n > 1:
+				context.PRIVMSG(msg.sender, "You may give or take karma in %s minutes." % n)
+			elif n == 1:
+				context.PRIVMSG(msg.sender, "You may give or take karma in 1 minute.")
+			else:
+				context.PRIVMSG(msg.sender, "You may give or take karma in less than a minute.")
+	
+	
+	@keyword('title')
+	def keyword_title(self, context, msg, trigger, args, kargs):
+		""" [--clear] [<new title>] :: Clear, set or show title. """
+		
+		player = self.get_player(msg.sender)
+		
+		if "clear" in kargs:
+			player.value.title = ""
+			player.value.full_name = player.value.name
+			player.commit()
+			msg.reply("%s is now unknown." % player.value.name)
+		else:
+			if args:
+				player.value.title = " ".join(args)
+				player.value.full_name = "%s %s" % (player.value.name, player.value.title)
+				player.value.full_name = player.value.full_name.rstrip()
+				player.commit()
+				msg.reply("%s is now known as %s." % (player.value.name, player.value.title))
+			else:
+				if player.value.title:
+					msg.reply("%s is known as %s." % (player.value.name, player.value.title))
+				else:
+					msg.reply("%s is unknown." % player.value.name)
+	
+	
+	@keyword('whois')
+	def keyword_whois(self, context, msg, trigger, args, kargs):
+		""" [<player>] :: Show information about <player>. """
+		
+		player = None
+		
+		if args:
+			player = self.get_player(args[0])
+		else:
+			player = self.get_player(msg.sender)
+		
+		if player.value.alignment == ALIGNMENT_LIGHT:
+			msg.reply("%s serves the Light." % player.value.full_name)
+		elif player.value.alignment == ALIGNMENT_NEUTRAL:
+			msg.reply("%s is a %s." % (player.value.full_name, player.value.unaligned_name))
+		elif player.value.alignment == ALIGNMENT_DARK:
+			msg.reply("%s serves the Dark." % player.value.full_name)
+	
+	
+	@observe('IRC_MSG_PRIVMSG')
+	def observe_privmsg_karma(self, context, msg):
+		""" Watch for karma adjustments. """
+		
+		m = re.match(r'^(?P<name>\S+)(?P<op>\+\+|--)$', msg.message)
+		if m:
+			player = self.get_player(msg.sender)
+			target_player = self.get_player(m.groupdict().get("name"))
+			
+			if player != target_player and target_player.value.name != context.botnick:
+				if player.value.next_karma <= time.time():
+					op = m.groupdict().get("op")
+					adj = 1.2 if player.value.alignment == target_player.value.alignment else 1
+					
+					if op == "++":
+						target_player.value.karma += adj
+					elif op == "--" and target_player.value.karma > 0:
+						target_player.value.karma -= adj
+					
+					player.value.next_karma = random.randint(180, 900) + time.time()
+					
+					player.commit()
+					target_player.commit()
