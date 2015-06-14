@@ -14,61 +14,65 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+
 import random
 
 from pyaib.plugins import keyword, observe, plugin_class
 from pyaib.db import db_driver
 
 
+SAYINGS = (
+	"As I see it, yes.",
+	"As I see it, no.",
+	"Ask again later.",
+	"Better not tell you now.",
+	"Cannot predict now.",
+	"Concentrate and ask again.",
+	"Count on it.",
+	"Don't count on it.",
+	"False.",
+	"It's certain.",
+	"It's not certain.",
+	"It is decidedly so.",
+	"It's a secret.",
+	"Most likely.",
+	"My reply is no.",
+	"My reply is yes.",
+	"Outlook good.",
+	"Outlook not so good.",
+	"Reply hazy, try again.",
+	"Signs point to no.",
+	"Signs point to yes.",
+	"That's a definite possibility.",
+	"True.",
+	"Very doubtful.",
+	"Without a doubt.",
+	"Yes, definitely.",
+	"You may rely on it.",
+	"Yes.")
+
+
 @plugin_class
 class Chance(object):
 	def __init__(self, context, config):
-		self.context = context
 		random.seed()
-		
-		self.sayings = [
-			"It is certain",
-			"It is decidedly so",
-			"Without a doubt",
-			"Yes, definitely",
-			"You may rely on it",
-			"As I see it, yes",
-			"Most likely",
-			"Outlook good",
-			"Yes",
-			"Signs point to yes",
-			"Reply hazy, try again",
-			"Ask again later",
-			"Better not tell you now",
-			"Cannot predict now",
-			"Concentrate and ask again",
-			"That's a definite possibility",
-			"Don't count on it",
-			"My reply is no",
-			"Outlook not so good",
-			"Very doubtful"]
 	
 	
 	@keyword('8')
 	def keyword_8ball(self, context, msg, trigger, args, kargs):
-		"""
-		Ask the magic 8 ball a question
-		"""
+		""" <question> :: Ask the magic 8 ball a question. """
 		
-		if len(args) >= 2 and args[-2] == "|":
-			msg.reply("%s: %s" % (args[-1], random.choice(self.sayings)))
+		if args:
+			msg.reply("%s" % random.choice(SAYINGS))
 		else:
-			msg.reply("%s" % random.choice(self.sayings))
+			msg.reply("Ask me anything.")
 	
 	
 	@keyword('choose')
 	def keyword_dice(self, context, msg, trigger, args, kargs):
-		"""
-		Choose randomly
-		"""
+		""" <choice> ... :: Choose randomly from the given choices. """
 		
-		if len(args) >= 3 and args[-2] == "|":
-			msg.reply("%s: %s" % (args[-1], random.choice(args[:-2])))
-		elif len(args) >= 1:
+		if args:
 			msg.reply("%s" % random.choice(args))
-	
+		else:
+			msg.reply("What are the choices?")
