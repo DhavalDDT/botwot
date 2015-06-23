@@ -39,7 +39,7 @@ BUFFALOS = (
 @plugin_class
 class Buffalo(object):
 	def __init__(self, context, config):
-		pass
+		random.seed()
 	
 	
 	@keyword("buffalo")
