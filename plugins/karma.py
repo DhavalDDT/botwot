@@ -309,6 +309,25 @@ class Karma(object):
 				context.PRIVMSG(msg.sender, "You may give or take karma in less than a minute.")
 	
 	
+	@keyword('record')
+	def keyword_record(self, context, msg, trigger, args, kargs):
+		""" [<player>] :: Report your or player's record. """
+		
+		if args:
+			player = self.get_player(args)
+			msg.reply("%s has %s wins, %s losses and %s ties." % (
+				player.value.full_name,
+				player.value.wins,
+				player.value.losses,
+				player.value.ties))
+		else:
+			player = self.get_player(msg.sender)
+			msg.reply("You have %s wins, %s losses and %s ties." % (
+				player.value.wins,
+				player.value.losses,
+				player.value.ties))
+	
+	
 	@keyword('title')
 	def keyword_title(self, context, msg, trigger, args, kargs):
 		""" [--clear] [<new title>] :: Clear, set or show title. """
