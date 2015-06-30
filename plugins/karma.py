@@ -241,7 +241,8 @@ class Karma(object):
 					if res[0] == res[1]:
 						winner, loser = (player, target_player) if res[0] == player else (target_player, player)
 						
-						winner.value.next_fight = random.randint(180, 900) + time.time()
+						if winner == player:
+							winner.value.next_fight = random.randint(180, 900) + time.time()
 						loser.value.next_fight = 0
 						
 						winner.value.wins += 1
