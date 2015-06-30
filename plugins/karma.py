@@ -326,7 +326,7 @@ class Karma(object):
 		""" [<player>] :: Report your or player's record. """
 		
 		if args:
-			player = self.get_player(args)
+			player = self.get_player(args[0])
 			msg.reply("%s has %s wins, %s losses and %s ties." % (
 				player.value.full_name,
 				player.value.wins,
