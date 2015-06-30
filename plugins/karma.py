@@ -249,7 +249,7 @@ class Karma(object):
 						loser.value.losses += 1
 						
 						if winner.value.alignment != ALIGNMENT_NEUTRAL:
-							chance = .15 if winner.value.alignment == loser.value.alignment else .65
+							chance = .15 if winner.value.alignment == loser.value.alignment else .80
 							if random.random() <= chance:
 								if loser.value.karma >= 1:
 									winner.value.karma += 1
