@@ -195,11 +195,22 @@ class Karma(object):
 			if args:
 				player = self.get_player(msg.sender)
 				target_player = self.get_player(args[0])
+				t = time.time()
 				
 				if player.value.name == target_player.value.name:
 					msg.reply("Suicide is not allowed.")
-				elif player.value.next_fight > time.time():
-					msg.reply("You are too exhausted.")
+				elif player.value.next_fight > t:
+					s = "You are too exhausted. "
+					n = int((player.value.next_fight - t) / 60)
+					
+					if n > 1:
+						s += "You may attack another player in %s minutes." % n
+					elif n == 1:
+						s += "You may attack another player in 1 minute."
+					else:
+						s += "You may attack another player in less than a minute."
+					
+					msg.reply(s)
 				else:
 					total = round(player.value.karma * 1.5) + round(target_player.value.karma * 1.5)
 					if total < 10:
