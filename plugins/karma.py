@@ -41,7 +41,7 @@ DAMAGE_TYPES = (
 	("pound", "pounds"),
 	("poke", "pokes"),
 	("punch", "punches"),
-	("rekt", "rekts"),
+	("rek", "reks"),
 	("scythe", "scythes"),
 	("shoot", "shoots"),
 	("slap", "slaps"),
