@@ -46,6 +46,7 @@ DAMAGE_TYPES = (
 	("slap", "slaps"),
 	("slash", "slashes"),
 	("slice", "slices"),
+	("slit", "slits"),
 	("smash", "smashes"),
 	("smite", "smites"),
 	("stab", "stabs"),
