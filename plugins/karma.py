@@ -224,16 +224,16 @@ class Karma(object):
 					for attacker, defender in (player, target_player), (target_player, player):
 						hit = random.randint(1, total)
 						if hit <= int(attacker.value.karma):
-							message += "%s %s %s" % (attacker.value.full_name, attacker.value.damage[1], defender.value.full_name)
+							message += "\x033%s %s %s\x03" % (attacker.value.full_name, attacker.value.damage[1], defender.value.full_name)
 							res.append(attacker)
 						elif total - int(defender.value.karma) < hit <= total:
-							message += "%s fails to %s %s" % (attacker.value.full_name, attacker.value.damage[0], defender.value.full_name)
+							message += "\x034%s fails to %s %s\x03" % (attacker.value.full_name, attacker.value.damage[0], defender.value.full_name)
 							res.append(defender)
 						elif random.choice((attacker, defender)) == attacker:
-							message += "%s %s %s" % (attacker.value.full_name, attacker.value.damage[1], defender.value.full_name)
+							message += "\x033%s %s %s\x03" % (attacker.value.full_name, attacker.value.damage[1], defender.value.full_name)
 							res.append(attacker)
 						else:
-							message += "%s fails to %s %s" % (attacker.value.full_name, attacker.value.damage[0], defender.value.full_name)
+							message += "\x034%s fails to %s %s\x03" % (attacker.value.full_name, attacker.value.damage[0], defender.value.full_name)
 							res.append(defender)
 						
 						if attacker == player:
