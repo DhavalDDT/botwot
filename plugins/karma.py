@@ -30,7 +30,9 @@ ALIGNMENT_NEUTRAL = 0
 ALIGNMENT_DARK = -1
 
 DAMAGE_TYPES = (
+	("bite", "bites"),
 	("blast", "blasts"),
+	("claw", "claws"),
 	("cleave", "cleaves"),
 	("crush", "crushes"),
 	("flap", "flaps"),
@@ -42,6 +44,7 @@ DAMAGE_TYPES = (
 	("poke", "pokes"),
 	("punch", "punches"),
 	("rek", "reks"),
+	("scratch", "scratches"),
 	("scythe", "scythes"),
 	("shank", "shanks"),
 	("shoot", "shoots"),
