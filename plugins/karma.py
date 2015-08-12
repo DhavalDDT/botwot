@@ -399,7 +399,7 @@ class Karma(object):
 			player = self.get_player(msg.sender)
 			target_player = self.get_player(m.groupdict().get("name"))
 			
-			if player != target_player and target_player.value.name != context.botnick:
+			if player.value.name != target_player.value.name and target_player.value.name != context.botnick:
 				if player.value.next_karma <= time.time():
 					op = m.groupdict().get("op")
 					adj = 1.2 if player.value.alignment == target_player.value.alignment else 1
