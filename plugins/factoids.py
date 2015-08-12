@@ -68,7 +68,7 @@ class Factoids(object):
 	def keyword_forget_factoid(self, context, msg, trigger, args, kargs):
 		""" <factoid> - Forget <factoid> """
 		
-		if args[0]:
+		if args and args[0]:
 			key = self.procs(args[0])
 			if self.db.get(key):
 				self.db.delete(key)
