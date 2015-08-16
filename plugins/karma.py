@@ -40,6 +40,7 @@ DAMAGE_TYPES = (
 	("hit", "hits"),
 	("lance", "lances"),
 	("pierce", "pierces"),
+	("plow", "plows"),
 	("pound", "pounds"),
 	("poke", "pokes"),
 	("punch", "punches"),
