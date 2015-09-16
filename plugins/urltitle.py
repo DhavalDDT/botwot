@@ -32,7 +32,7 @@ class UrlTitle(object):
 	def observe_privmsg(self, context, msg):
 		""" Look up HTML titles for URLs """
 		
-		m = re.match(r'(.* )?(?P<url>(https?://)?(www\.)?([a-z0-9\.\-]+\.[a-z0-9]+)\S*)( .*)?', msg.message)
+		m = re.match(r'?(?P<url>https?://\S*)', msg.message)
 		if m:
 			# Grab the URL
 			url = m.groupdict().get("url")
