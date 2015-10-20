@@ -266,7 +266,7 @@ class Karma(object):
 						winner.commit()
 						loser.commit()
 					else:
-						player.value.next_fight = random.randint(180, 900) + time.time()
+						player.value.next_fight = random.randint(10800, 14400) + time.time()
 						
 						player.value.ties += 1
 						target_player.value.ties += 1
